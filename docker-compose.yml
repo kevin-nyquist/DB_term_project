@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  frontendui:
+    build: frontendui
+    ports:
+      - 80:8501
+    volumes:
+      - './frontendui:/app'
+    depends_on:
+      - service
+    
+  service:
+    build: service
+    command: uvicorn main:app --host 0.0.0.0 --port 80 --reload
+    ports:
+      - 8001:80
+    volumes:
+      - './service:/app'
+
+  postgres:
+    image: postgres:14 #-alpine
+    container_name: "postgres14"
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    # env_file:
+    #   - database.env # configure postgres
+    expose:
+      - "5435"
+    environment:
+       POSTGRES_USER: postgres
+       POSTGRES_PASSWORD: postgres
+      # POSTGRES_DB=postgres
