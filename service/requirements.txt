@@ -4,3 +4,4 @@ uvicorn
 watchfiles
 sqlalchemy
 psycopg2
+alembic
