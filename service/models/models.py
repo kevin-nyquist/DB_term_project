@@ -52,7 +52,7 @@ class CarbonEmissionsSource(Base):
     source_type = Column(String, index=True)
     total_emission_value = Column(Float, index=True)
     
-    branch = relationship("CompanyBranch", back_populates="emissions_sources")
+    branch = relationship("CompanyBranch", back_populates="emission_sources")
     footprints = relationship("CarbonFootprint", back_populates="source")
     
 
