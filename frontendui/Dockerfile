@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.9.12
 
 WORKDIR /app
 
@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 8501
 
-CMD ["streamlit", "run", "src/app.py"]
+CMD ["streamlit", "run", "src/streamlit_app.py", "--client.showErrorDetails=false"]
