@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 8501
 
-CMD ["streamlit", "run", "src/streamlit_app", "--client.showErrorDetails=false"]
+CMD ["streamlit", "run", "src/streamlit_app.py", "--client.showErrorDetails=false"]

@@ -19,22 +19,23 @@ def make_sidebar():
         st.title(cv.side_bar_title)
         st.write("")
         st.write("")
+        st.page_link("streamlit_app.py", label='home', icon='🏠')
 
-        if st.session_state.get("logged_in", False):
+        if st.session_state.get('authentication_status', False):
             st.page_link("pages/page1.py", label=cv.page1_title, icon=cv.page1_icon)
             st.page_link("pages/page2.py", label=cv.page2_title, icon=cv.page2_icon)
 
+
             st.write("")
             st.write("")
 
-            if st.button("Log out"):
-                logout()
+            # if st.button("Log out"):
+            #     logout()
 
         elif get_current_page_name() != "streamlit_app":
             # If anyone tries to access a secret page without being logged in,
             # redirect them to the login page
             st.switch_page("streamlit_app.py")
-
 
 def logout():
     st.session_state.logged_in = False
