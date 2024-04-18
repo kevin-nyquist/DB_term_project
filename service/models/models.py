@@ -54,6 +54,7 @@ class CarbonEmissionsSource(Base):
     
     branch = relationship("CompanyBranch", back_populates="emission_sources")
     footprints = relationship("CarbonFootprint", back_populates="source")
+    sequestrations = relationship("CarbonSequestration", back_populates="source")
     
 
 class CarbonRegulation(Base):

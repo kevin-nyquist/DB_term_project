@@ -81,7 +81,7 @@ def create_carbon_regulation(db: Session, regulation: schemas.CarbonRegulationCr
     db.refresh(db_regulation)
     return db_regulation
 
-def get_regulation_by_cid(db: Session, regulation_id: int):
+def get_regulation_by_id(db: Session, regulation_id: int):
     return db.query(models.Company).filter(models.CarbonRegulation.id == regulation_id).first()
 
 
