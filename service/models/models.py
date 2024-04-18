@@ -3,7 +3,7 @@ from sqlalchemy import Column, ForeignKey
 import enum
 from sqlalchemy.orm import relationship
 
-from database import Base
+from models.database import Base
 
 
 class Company(Base):
@@ -54,6 +54,7 @@ class CarbonEmissionsSource(Base):
     
     branch = relationship("CompanyBranch", back_populates="emission_sources")
     footprints = relationship("CarbonFootprint", back_populates="source")
+    sequestrations = relationship("CarbonSequestration", back_populates="source")
     
 
 class CarbonRegulation(Base):
@@ -72,3 +73,12 @@ class CarbonFootprint(Base):
     footprint_value = Column(Float, index=True)
     
     source = relationship("CarbonEmissionsSource", back_populates="footprints")
+
+class CarbonSequestration(Base): 
+    __tablename__ = "carbon_sequestration"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    source_id = Column(Integer, ForeignKey("carbon_emissions_sources.id"))
+    seq_value = Column(Float, index=True)
+    
+    source = relationship("CarbonEmissionsSource", back_populates="sequestrations")
