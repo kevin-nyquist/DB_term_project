@@ -12,11 +12,16 @@ services:
     
   service:
     build: service
-    command: uvicorn main:app --host 0.0.0.0 --port 80 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 80 --reload 
     ports:
       - 8001:80
     volumes:
       - './service:/app'
+    restart: always
+    depends_on:
+      - postgres
+
+
 
   postgres:
     image: postgres:14 #-alpine
@@ -26,6 +31,8 @@ services:
       - 5432:5432
     expose:
       - "5435"
+    volumes:
+    - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     user: postgres
     environment:
        POSTGRES_USER: postgres
