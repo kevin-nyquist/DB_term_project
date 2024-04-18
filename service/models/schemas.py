@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 from sqlite3 import Date
 from pydantic import BaseModel
 from typing import List, Optional
@@ -19,6 +19,9 @@ class Company(CompanyBase):
     class Config:
         orm_mode = True
 
+class CompanyUpdate(BaseModel):
+    c_name: str
+
 
 # CarbonOffset
 class OffsetType(str, Enum):
@@ -26,9 +29,9 @@ class OffsetType(str, Enum):
     reforestation = "reforestation"
 
 class CarbonOffsetBase(BaseModel):
-    offset_type: OffsetType
+    offset_type: str
     offset_amount: int
-    date: Optional[str]
+    date: Optional[date]
     
 
 class CarbonOffsetCreate(CarbonOffsetBase):
@@ -58,6 +61,9 @@ class CompanyBranch(CompanyBranchBase):
 
     class Config:
         orm_mode = True
+
+class CompanyBranchUpdate(CompanyBranchBase):
+    branch_name: str
 
 
 # CarbonEmissionsSource
@@ -103,6 +109,9 @@ class CarbonFootprintBase(BaseModel):
 class CarbonFootprintCreate(CarbonFootprintBase):
     source_id: int
 
+class CarbonFootprintUpdate(BaseModel):
+    footprint_value: float
+
 
 class CarbonFootprint(CarbonFootprintBase):
     id: int
@@ -119,6 +128,9 @@ class CarbonSequestrationBase(BaseModel):
 
 class CarbonSequestrationCreate(CarbonSequestrationBase):
     source_id: int
+
+class CarbonSequestrationUpdate(BaseModel):
+    seq_val: float
 
 
 class CarbonSequestration(CarbonSequestrationBase):
