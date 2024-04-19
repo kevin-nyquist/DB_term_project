@@ -37,6 +37,10 @@ class CarbonOffsetBase(BaseModel):
 class CarbonOffsetCreate(CarbonOffsetBase):
     company_id: int
 
+class CarbonOffsetUpdate(CarbonOffsetBase):
+    offset_amount: int
+    date: Optional[date]
+
 
 class CarbonOffset(CarbonOffsetBase):
     id: int
@@ -76,6 +80,11 @@ class CarbonEmissionsSourceCreate(CarbonEmissionsSourceBase):
     branch_id: int
 
 
+class CarbonEmissionsSourceUpdate(BaseModel):
+    source_type: str
+    total_emission_value: float
+
+
 class CarbonEmissionsSource(CarbonEmissionsSourceBase):
     id: int
     branch_id: int
@@ -93,6 +102,9 @@ class CarbonRegulationBase(BaseModel):
 class CarbonRegulationCreate(CarbonRegulationBase):
     pass
 
+class CarbonRegulationUpdate(CarbonRegulationBase):
+    regulation_name: str
+    description: str
 
 class CarbonRegulation(CarbonRegulationBase):
     id: int

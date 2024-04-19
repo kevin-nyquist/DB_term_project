@@ -50,6 +50,47 @@ def create_carbon_offset(db: Session, carbon_offset: schemas.CarbonOffsetCreate)
     db.refresh(db_carbon_offset)
     return db_carbon_offset
 
+def get_carbon_offset(db: Session, carbon_offset_id: int):
+    return db.query(models.CarbonOffset).filter(models.CarbonOffset.id == carbon_offset_id).first()
+
+
+def update_carbon_offset(db: Session, carbon_offset_id: int, carbon_offset_update: schemas.CarbonOffsetUpdate):
+    """
+    Update a carbon offset entry.
+
+    Args:
+        carbon_offset_update (CarbonOffsetUpdate): Data to update the carbon offset.
+        carbon_offset_id (int): ID of the associated offset.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        CarbonOffset: The updated carbon offset.
+    """
+    db_carbon_offset = get_carbon_offset(db, carbon_offset_id)
+    if db_carbon_offset:
+        for field, value in carbon_offset_update.dict(exclude_unset=True).items():
+            setattr(db_carbon_offset, field, value)
+        db.commit()
+        db.refresh(db_carbon_offset)
+    return db_carbon_offset
+
+def delete_carbon_offset(db: Session, carbon_offset_id: int):
+    """
+    Delete a carbon offset entry.
+
+    Args:
+        carbon_offset_id: ID of the carbon offset to delete.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        CarbonOffset: The updated carbon offset.
+    """
+    db_carbon_offset = get_carbon_offset(db, carbon_offset_id)
+    if db_carbon_offset:
+        db.delete(db_carbon_offset)
+        db.commit()
+    return db_carbon_offset
+
 # gets the specified company branch from the branch ID
 def get_company_branch(db: Session, branch_id: int):
     return db.query(models.CompanyBranch).filter(models.CompanyBranch.id == branch_id).first()
@@ -101,6 +142,25 @@ def create_carbon_emissions_source(db: Session, emissions_source: schemas.Carbon
     db.refresh(db_emissions_source)
     return db_emissions_source
 
+def update_carbon_emissions_source(db: Session, source_id: int, source_update: schemas.CarbonEmissionsSourceUpdate):
+    db_source = get_carbon_emissions_source(db, source_id)
+    if db_source:
+        for field, value in source_update.dict(exclude_unset=True).items():
+            setattr(db_source, field, value)
+        db.commit()
+        db.refresh(db_source)
+    return db_source
+
+def delete_carbon_emissions_source(db: Session, source_id: int):
+    db_source = get_carbon_emissions_source(db, source_id)
+    if db_source:
+        db.delete(db_source)
+        db.commit()
+    return db_source
+
+def get_carbon_emissions_source(db: Session, source_id: int):
+    return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.id == source_id).first()
+
 
 def get_carbon_regulations(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonRegulation).offset(skip).limit(limit).all()
@@ -112,6 +172,25 @@ def create_carbon_regulation(db: Session, regulation: schemas.CarbonRegulationCr
     db.commit()
     db.refresh(db_regulation)
     return db_regulation
+
+def delete_regulation(db: Session, regulation_id: int):
+    regulation = db.query(models.CarbonRegulation).filter(models.CarbonRegulation.id == regulation_id).first()
+    if regulation:
+        db.delete(regulation)
+        db.commit()
+        return regulation
+    return None
+
+def update_regulation(db: Session, regulation_id: int, regulation_update: schemas.CarbonRegulationUpdate):
+    regulation = db.query(models.CarbonRegulation).filter(models.CarbonRegulation.id == regulation_id).first()
+    if regulation:
+        regulation.c_name = regulation_update.c_name
+        regulation.description = regulation_update.description
+        db.commit()
+        db.refresh(regulation)
+        return regulation
+    return None
+    
 
 def get_regulation_by_id(db: Session, regulation_id: int):
     return db.query(models.Company).filter(models.CarbonRegulation.id == regulation_id).first()
@@ -218,6 +297,17 @@ def create_sequestration(db: Session, sequestration: schemas.CarbonSequestration
     db.refresh(db_sequestration)
     return db_sequestration
 
+def get_carbon_sequestration(db: Session, seq_id: int):
+    return db.query(models.CarbonSequestration).filter(models.CarbonSequestration.id == seq_id).first()
+
+# Function to delete a carbon sequestration entry
+def delete_carbon_sequestration(db: Session, seq_id: int):
+    db_seq = get_carbon_sequestration(db, seq_id)
+    if db_seq:
+        db.delete(db_seq)
+        db.commit()
+    return db_seq
+
 
 def create_carbon_footprint(db: Session, carbon_footprint: schemas.CarbonFootprintCreate, emission_source_id: int):
     """
@@ -277,3 +367,15 @@ def update_carbon_footprint(db: Session, carbon_footprint: models.CarbonFootprin
     db.commit()
     db.refresh(carbon_footprint)
     return carbon_footprint
+
+def get_carbon_footprint(db: Session, footprint_id: int):
+    return db.query(models.CarbonFootprint).filter(models.CarbonFootprint.id == footprint_id).first()
+
+
+# Function to delete a carbon footprint entry
+def delete_carbon_footprint(db: Session, footprint_id: int):
+    db_footprint = get_carbon_footprint(db, footprint_id)
+    if db_footprint:
+        db.delete(db_footprint)
+        db.commit()
+    return db_footprint
