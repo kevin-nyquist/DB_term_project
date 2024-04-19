@@ -3,7 +3,7 @@ from sqlalchemy import Column, ForeignKey
 import enum
 from sqlalchemy.orm import relationship
 
-from database import Base
+from models.database import Base
 
 
 class Company(Base):
@@ -12,8 +12,8 @@ class Company(Base):
     id = Column(Integer, primary_key=True, index=True)
     c_name = Column(String, index=True)
 
-    carbon_offsets = relationship("CarbonOffset", back_populates="company")
-    branches = relationship("CompanyBranch", back_populates="company")
+    carbon_offsets = relationship("CarbonOffset", back_populates="company", cascade="all, delete-orphan")
+    branches = relationship("CompanyBranch", back_populates="company", cascade="all, delete-orphan")
 
 
 class OffsetType(enum.Enum):
@@ -41,7 +41,7 @@ class CompanyBranch(Base):
     branch_name = Column(String, index=True)
 
     company = relationship("Company", back_populates="branches")
-    emission_sources = relationship("CarbonEmissionsSource", back_populates="branch")
+    emission_sources = relationship("CarbonEmissionsSource", back_populates="branch", cascade="all, delete-orphan")
 
 
 class CarbonEmissionsSource(Base):
@@ -53,7 +53,8 @@ class CarbonEmissionsSource(Base):
     total_emission_value = Column(Float, index=True)
     
     branch = relationship("CompanyBranch", back_populates="emission_sources")
-    footprints = relationship("CarbonFootprint", back_populates="source")
+    footprints = relationship("CarbonFootprint", back_populates="source", cascade="all, delete-orphan")
+    sequestrations = relationship("CarbonSequestration", back_populates="source", cascade="all, delete-orphan")
     
 
 class CarbonRegulation(Base):
@@ -72,3 +73,12 @@ class CarbonFootprint(Base):
     footprint_value = Column(Float, index=True)
     
     source = relationship("CarbonEmissionsSource", back_populates="footprints")
+
+class CarbonSequestration(Base): 
+    __tablename__ = "carbon_sequestration"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    source_id = Column(Integer, ForeignKey("carbon_emissions_sources.id"))
+    seq_value = Column(Float, index=True)
+    
+    source = relationship("CarbonEmissionsSource", back_populates="sequestrations")
