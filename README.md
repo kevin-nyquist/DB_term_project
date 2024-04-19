@@ -25,6 +25,7 @@ CREATE DATABASE dbproject;
 ### Migrations
 After creating the database, you need to apply the migrations using `Alembic`. You can do it with the following command inside the `models` folder: 
 ```bash
+docker-compose exec service (cd models ; alembic upgrade head)
 alembic upgrade head
 ```
 If you make changes on the `models.py` file, you have to make a new migration. You can do it by running: 
@@ -35,3 +36,6 @@ alembic revision --autogenerate -m "message"
 ### Populate DB
 Run `python populate_db.py` to populate the db with a small number of entries. 
 To use a custom number of entries, you can use the script with args (e.g. `--companies 10`) 
+```bash
+docker-compose exec service python models/populate_db.py
+```
