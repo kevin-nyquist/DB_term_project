@@ -402,7 +402,7 @@ def get_carbon_sequestrations(source_id: int, db: Session = Depends(get_db), ski
     Raises:
         HTTPException: If the carbon emissions source with the given ID is not found.
     """
-    db_emissions_source = crud.get_emissions_source(db, source_id=source_id)
+    db_emissions_source = crud.get_emissions_source(db, emission_source_id=source_id)
     if db_emissions_source is None:
         raise HTTPException(status_code=400, detail="Emissions source not found")
     company_branches = crud.get_carbon_sequestrations(db=db, source_id=source_id, skip=skip, limit=limit)
@@ -427,7 +427,7 @@ def create_carbon_sequestration(sequestration: schemas.CarbonSequestrationCreate
     if db_emission_sources is None:
         raise HTTPException(status_code=400, detail="Emissions source not found")
     
-    return crud.create_sequestration(db=db, sequestration=sequestration, emission_source_id=emission_source_id)
+    return crud.create_carbon_sequestration(db=db, sequestration=sequestration)
 
 @app.put("/carbon_sequestration/{seq_id}", response_model=schemas.CarbonSequestrationBase)
 def update_carbon_sequestration(
@@ -460,10 +460,10 @@ def create_regulation(regulation: schemas.CarbonRegulationCreate, db: Session = 
     Raises:
         HTTPException: If the regulation with the given name is already present in the database.
     """
-    db_regulation = crud.get_regulation_by_name(db, c_name=regulation.c_name)
+    db_regulation = crud.get_regulation_by_name(db, regulation_name=regulation.regulation_name)
     if db_regulation:
         raise HTTPException(status_code=400, detail="Regulation already added")
-    return crud.create_regulation(db=db, regulation=regulation)
+    return crud.create_carbon_regulation(db=db, regulation=regulation)
 
 
 # Get regulation from id endpoint

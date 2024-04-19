@@ -131,8 +131,11 @@ def delete_branch(db: Session, branch_id: int):
         return branch
 
 # gets all carbon emission sources associated with a specific branch
-def get_carbon_emissions_sources(db: Session, branch_id: int):
+def get_carbon_emissions_sources(db: Session, branch_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.branch_id == branch_id).offset(skip).limit(limit).all()
+
+def get_carbon_emissions_sources(db: Session, source_id: int, skip: int = 0, limit: int = 100):
+    return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.id == source_id).offset(skip).limit(limit).all()
 
 
 def create_carbon_emissions_source(db: Session, emissions_source: schemas.CarbonEmissionsSourceCreate):
@@ -192,8 +195,8 @@ def update_regulation(db: Session, regulation_id: int, regulation_update: schema
     return None
     
 
-def get_regulation_by_id(db: Session, regulation_id: int):
-    return db.query(models.Company).filter(models.CarbonRegulation.id == regulation_id).first()
+def get_regulation_by_name(db: Session, regulation_name: str):
+    return db.query(models.Company).filter(models.CarbonRegulation.regulation_name == regulation_name).first()
 
 
 def get_carbon_footprints(db: Session, source_id: int):
@@ -212,12 +215,24 @@ def get_carbon_sequestrations(db: Session, source_id: int, skip: int = 0, limit:
 
 
 def create_carbon_sequestration(db: Session, sequestration: schemas.CarbonSequestrationCreate):
-    db_sequestration = models.CarbonFootprint(**sequestration.dict())
+    db_sequestration = models.CarbonSequestration(**sequestration.dict())
     db.add(db_sequestration)
     db.commit()
     db.refresh(db_sequestration)
     return db_sequestration
 
+def get_emissions_source(db: Session, emission_source_id: int):
+    """
+    Get a specific emission source by emission source ID.
+
+    Args:
+        db (Session): SQLAlchemy database session.
+        emission_source_id (int): ID of the emission source within the branch.
+
+    Returns:
+        models.CarbonEmissionsSource: The retrieved emission source, or None if not found.
+    """
+    return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.id == emission_source_id).first()
 
 def get_emission_source_by_ids(db: Session, company_id: int, branch_id: int, emission_source_id: int):
     """
@@ -278,24 +293,6 @@ def update_sequestration(db: Session, sequestration: models.CarbonSequestration,
     db.commit()
     db.refresh(sequestration)
     return sequestration
-
-def create_sequestration(db: Session, sequestration: schemas.CarbonSequestrationCreate, emission_source_id: int):
-    """
-    Create a new sequestration entry in the database.
-
-    Args:
-        db (Session): SQLAlchemy database session.
-        sequestration (schemas.SequestrationCreate): Data for creating the sequestration entry.
-        emission_source_id (int): ID of the emission source associated with the sequestration.
-
-    Returns:
-        models.CarbonSequestration: The created sequestration entry.
-    """
-    db_sequestration = models.CarbonSequestration(**sequestration.dict(), source_id=emission_source_id)
-    db.add(db_sequestration)
-    db.commit()
-    db.refresh(db_sequestration)
-    return db_sequestration
 
 def get_carbon_sequestration(db: Session, seq_id: int):
     return db.query(models.CarbonSequestration).filter(models.CarbonSequestration.id == seq_id).first()
