@@ -446,7 +446,7 @@ def get_companies_summaries(db:Session):
     footprints = (
         (
             db.query(
-                models.Company.id,
+                models.Company.c_name,
                 F.sum(models.CarbonFootprint.footprint_value).label("total_footprint"),
             )
             .join(models.CompanyBranch)
@@ -459,7 +459,7 @@ def get_companies_summaries(db:Session):
     sequestrations = (
         (
             db.query(
-                models.Company.id,
+                models.Company.c_name,
                 F.sum(models.CarbonSequestration.seq_value).label("total_seq"),
             )
             .join(models.CompanyBranch)
