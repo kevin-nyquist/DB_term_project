@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 from sqlite3 import Date
 from pydantic import BaseModel
 from typing import List, Optional
@@ -19,6 +19,9 @@ class Company(CompanyBase):
     class Config:
         orm_mode = True
 
+class CompanyUpdate(BaseModel):
+    c_name: str
+
 
 # CarbonOffset
 class OffsetType(str, Enum):
@@ -26,13 +29,17 @@ class OffsetType(str, Enum):
     reforestation = "reforestation"
 
 class CarbonOffsetBase(BaseModel):
-    offset_type: OffsetType
+    offset_type: str
     offset_amount: int
-    date: Optional[str]
+    date: Optional[date]
     
 
 class CarbonOffsetCreate(CarbonOffsetBase):
     company_id: int
+
+class CarbonOffsetUpdate(CarbonOffsetBase):
+    offset_amount: int
+    date: Optional[date]
 
 
 class CarbonOffset(CarbonOffsetBase):
@@ -59,6 +66,9 @@ class CompanyBranch(CompanyBranchBase):
     class Config:
         orm_mode = True
 
+class CompanyBranchUpdate(CompanyBranchBase):
+    branch_name: str
+
 
 # CarbonEmissionsSource
 class CarbonEmissionsSourceBase(BaseModel):
@@ -68,6 +78,11 @@ class CarbonEmissionsSourceBase(BaseModel):
 
 class CarbonEmissionsSourceCreate(CarbonEmissionsSourceBase):
     branch_id: int
+
+
+class CarbonEmissionsSourceUpdate(BaseModel):
+    source_type: str
+    total_emission_value: float
 
 
 class CarbonEmissionsSource(CarbonEmissionsSourceBase):
@@ -87,6 +102,9 @@ class CarbonRegulationBase(BaseModel):
 class CarbonRegulationCreate(CarbonRegulationBase):
     pass
 
+class CarbonRegulationUpdate(CarbonRegulationBase):
+    regulation_name: str
+    description: str
 
 class CarbonRegulation(CarbonRegulationBase):
     id: int
@@ -102,6 +120,9 @@ class CarbonFootprintBase(BaseModel):
 
 class CarbonFootprintCreate(CarbonFootprintBase):
     source_id: int
+
+class CarbonFootprintUpdate(BaseModel):
+    footprint_value: float
 
 
 class CarbonFootprint(CarbonFootprintBase):
@@ -119,6 +140,9 @@ class CarbonSequestrationBase(BaseModel):
 
 class CarbonSequestrationCreate(CarbonSequestrationBase):
     source_id: int
+
+class CarbonSequestrationUpdate(BaseModel):
+    seq_val: float
 
 
 class CarbonSequestration(CarbonSequestrationBase):
