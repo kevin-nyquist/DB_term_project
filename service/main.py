@@ -541,4 +541,37 @@ def delete_regulation(regulation_id: int, db: Session = Depends(get_db)):
     return deleted_regulation
 
 
+@router.get("/company/{company_id}/summary")
+def get_company_summary(company_id: int, db: Session = Depends(get_db)):
+    """
+    Get a summary of a company's carbon emissions and offsets.
+
+    Args:
+        company_id : The company's ID.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: A dictionary containing the company's carbon emissions and offsets.
+    Raises:
+        HTTPException: If the company with the given ID is not found.
+    """
+    return crud.get_company_summary(db, company_id=company_id)
+
+@router.get("/baranch/{branch_id}/summary")
+def get_branch_summary(branch_id: int, db: Session = Depends(get_db)):
+    """
+    Get a summary of a company's carbon emissions and offsets.
+
+    Args:
+        branch_id : The branch's ID.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: A dictionary containing the branch's carbon emissions and offsets.
+    Raises:
+        HTTPException: If the branch with the given ID is not found.
+    """
+    return crud.get_branch_summary(db, branch_id=branch_id)
+
+
 app.include_router(router)
