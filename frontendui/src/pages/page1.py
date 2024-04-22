@@ -11,8 +11,7 @@ st.write(
     f"""
 # {cv.page1_title}
 
-In this page we will analyze the carbon emissions of a company. We will look at the carbon emissions of the company in different regions and compare them to the company's carbon emissions goals. We will also look at the company's carbon emissions over time and see how they have changed.
-
+{cv.page1_description}
 """
 )
 
@@ -22,7 +21,7 @@ col1, col2 = st.columns(2)
 with col1:
     company = requests.get("http://service:80/companies/").json()
     company = pd.DataFrame(company)
-    company_name = company["c_name"].tolist()
+    company_name = sorted(company["c_name"].tolist())
 
     sel_comp_name = st.selectbox(
         'Companies',
@@ -32,7 +31,7 @@ with col1:
 with col2:
     company_branches = requests.get(f"http://service:80/companies/{sel_comp_id}/branches").json() 
     company_branches = pd.DataFrame(company_branches)
-    company_branches_name = company_branches["branch_name"].tolist()
+    company_branches_name = sorted(company_branches["branch_name"].tolist())
 
     sel_branch_name = st.selectbox(
         'branches',
