@@ -134,7 +134,7 @@ def delete_branch(db: Session, branch_id: int):
 def get_carbon_emissions_sources(db: Session, branch_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.branch_id == branch_id).offset(skip).limit(limit).all()
 
-def get_carbon_emissions_sources(db: Session, source_id: int, skip: int = 0, limit: int = 100):
+def get_carbon_emissions_sources_by_id(db: Session, source_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.id == source_id).offset(skip).limit(limit).all()
 
 
@@ -199,7 +199,7 @@ def get_regulation_by_name(db: Session, regulation_name: str):
     return db.query(models.Company).filter(models.CarbonRegulation.regulation_name == regulation_name).first()
 
 
-def get_carbon_footprints(db: Session, source_id: int):
+def get_carbon_footprints(db: Session, source_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonFootprint).filter(models.CarbonFootprint.source_id == source_id).offset(skip).limit(limit).all()
 
 
@@ -376,3 +376,67 @@ def delete_carbon_footprint(db: Session, footprint_id: int):
         db.delete(db_footprint)
         db.commit()
     return db_footprint
+
+def get_company_summary(db: Session, company_id: int):
+    """
+    Get a summary of a company's carbon emissions and sequestrations.
+
+    Args:
+        db (Session): SQLAlchemy database session.
+        company_id (int): ID of the company.
+
+    Returns:
+        dict: Summary of the company's carbon emissions and sequestrations.
+    """
+    # Get the company's branches
+    branches = get_company_branches(db, company_id)
+    branch_ids = [branch.id for branch in branches]
+
+    # Get the company's carbon emissions sources
+    emissions_sources = db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.branch_id.in_(branch_ids)).all()
+    emission_source_ids = [source.id for source in emissions_sources]
+
+    # Get the company's carbon footprints
+    footprints = db.query(models.CarbonFootprint).filter(models.CarbonFootprint.source_id.in_(emission_source_ids)).all()
+
+    # Get the company's carbon sequestrations
+    sequestrations = db.query(models.CarbonSequestration).filter(models.CarbonSequestration.source_id.in_(emission_source_ids)).all()
+
+    # Calculate the total carbon emissions and sequestrations
+    total_emissions = sum([footprint.footprint_value for footprint in footprints])
+    total_sequestrations = sum([sequestration.seq_value for sequestration in sequestrations])
+
+    return {
+        "total_emissions": total_emissions,
+        "total_sequestrations": total_sequestrations
+    }
+    
+def get_branch_summary(db: Session, branch_id: int):
+    """
+    Get a summary of a branch's carbon emissions and sequestrations.
+
+    Args:
+        db (Session): SQLAlchemy database session.
+        branch_id (int): ID of the branch.
+
+    Returns:
+        dict: Summary of the branch's carbon emissions and sequestrations.
+    """
+    # Get the branch's carbon emissions sources
+    emissions_sources = get_carbon_emissions_sources(db, branch_id)
+    emission_source_ids = [source.id for source in emissions_sources]
+
+    # Get the branch's carbon footprints
+    footprints = db.query(models.CarbonFootprint).filter(models.CarbonFootprint.source_id.in_(emission_source_ids)).all()
+
+    # Get the branch's carbon sequestrations
+    sequestrations = db.query(models.CarbonSequestration).filter(models.CarbonSequestration.source_id.in_(emission_source_ids)).all()
+
+    # Calculate the total carbon emissions and sequestrations
+    total_emissions = sum([footprint.footprint_value for footprint in footprints])
+    total_sequestrations = sum([sequestration.seq_value for sequestration in sequestrations])
+
+    return {
+        "total_emissions": total_emissions,
+        "total_sequestrations": total_sequestrations
+    }

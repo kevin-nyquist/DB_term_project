@@ -321,11 +321,11 @@ def get_carbon_footprints(source_id: int, db: Session = Depends(get_db), skip: i
     Raises:
         HTTPException: If the carbon emissions source with the given ID is not found.
     """
-    db_footprint = crud.get_carbon_footprint(db, source_id=source_id)
-    if db_footprint is None:
-        raise HTTPException(status_code=400, detail="Emissions source not found")
-    company_branches = crud.get_carbon_footprints(db=db, source_id=source_id, skip=skip, limit=limit)
-    return company_branches
+    db_emission_source = crud.get_carbon_emissions_source(db, source_id=source_id)
+    if db_emission_source is None:
+        raise HTTPException(status_code=400, detail="No footprints found")
+    carbon_footprints = crud.get_carbon_footprints(db=db, source_id=source_id, skip=skip, limit=limit)
+    return carbon_footprints
 
 @app.post("/emissionssource/", response_model=schemas.CarbonEmissionsSource)
 def create_carbon_emissions_source(source: schemas.CarbonEmissionsSourceCreate, db: Session = Depends(get_db)):
@@ -362,7 +362,7 @@ def create_carbon_footprint(footprint: schemas.CarbonFootprintCreate, db: Sessio
     Raises:
         HTTPException: If the emissions source with the given ID is not found.
     """
-    db_emission_sources = crud.get_carbon_emissions_sources(db, source_id=footprint.source_id)
+    db_emission_sources = crud.get_carbon_emissions_sources_by_id(db, source_id=footprint.source_id)
     if db_emission_sources is None:
         raise HTTPException(status_code=400, detail="Emissions source not found")
     
@@ -423,7 +423,7 @@ def create_carbon_sequestration(sequestration: schemas.CarbonSequestrationCreate
     Raises:
         HTTPException: If the emissions source with the given ID is not found.
     """
-    db_emission_sources = crud.get_carbon_emissions_sources(db, source_id=sequestration.source_id)
+    db_emission_sources = crud.get_carbon_emissions_sources_by_id(db, source_id=sequestration.source_id)
     if db_emission_sources is None:
         raise HTTPException(status_code=400, detail="Emissions source not found")
     
@@ -539,6 +539,39 @@ def delete_regulation(regulation_id: int, db: Session = Depends(get_db)):
     if deleted_regulation is None:
         raise HTTPException(status_code=404, detail="Regulation not found")
     return deleted_regulation
+
+
+@router.get("/company/{company_id}/summary")
+def get_company_summary(company_id: int, db: Session = Depends(get_db)):
+    """
+    Get a summary of a company's carbon emissions and offsets.
+
+    Args:
+        company_id : The company's ID.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: A dictionary containing the company's carbon emissions and offsets.
+    Raises:
+        HTTPException: If the company with the given ID is not found.
+    """
+    return crud.get_company_summary(db, company_id=company_id)
+
+@router.get("/baranch/{branch_id}/summary")
+def get_branch_summary(branch_id: int, db: Session = Depends(get_db)):
+    """
+    Get a summary of a company's carbon emissions and offsets.
+
+    Args:
+        branch_id : The branch's ID.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: A dictionary containing the branch's carbon emissions and offsets.
+    Raises:
+        HTTPException: If the branch with the given ID is not found.
+    """
+    return crud.get_branch_summary(db, branch_id=branch_id)
 
 
 app.include_router(router)
