@@ -192,7 +192,7 @@ if sel_table == 'carbon_offsets':
                 st.write(f"Failed to delete carbon offset with id: {co_id}")
                 
 
-        st.session_state.pop('edit_branches', None)
+        st.session_state.pop('edit_carbon_offset', None)
         
 # if sel_table == 'carbon_emissions_sources':
     # st.subheader('Carbon Emissions Sources') 
@@ -239,7 +239,15 @@ def post_carbon_regulations(added_rows):
                 st.write(f"Added regulation with regulation_name: {added_row['regulation_name']}")
             else:
                 st.write(f"Failed to add regulation with regulation_name: {added_row['regulation_name']}")
-                
+
+def put_carbon_regulations(edited_rows):
+    for row_idx in edited_rows:
+        c_id = company.loc[row_idx,['id']].values[0]
+        updated_row = edit_company_data['edited_rows'][row_idx]
+        req = requests.put(f'http://service:80/company/{c_id}', headers=headers, json=updated_row)
+        if req.status_code == 200:
+            st.write(f"Updated company with id: {c_id}, c_name: {updated_row['c_name']}")
+                                
 
 if sel_table == 'carbon_regulations':
     st.subheader("Carbon Regulations")
@@ -247,26 +255,43 @@ if sel_table == 'carbon_regulations':
     if len(carbon_regulations) == 0:
         st.write(f"No carbon regulations found")
         # st.stop()
-        carbon_regulations = [{"regulation_name": "None","description": "None", "id": 1}]
+        carbon_regulations = [{"regulation_name": None,"description": None, "id": 1}]
+        carbon_regulations_col_ed = st.experimental_data_editor(carbon_regulations, hide_index=True, disabled=["id"], key="edit_carbon_regulations")
+        edit_carbon_regulations = st.session_state["edit_carbon_regulations"]
+        check_edit = len(edit_carbon_regulations['edited_rows']) > 0
+        if check_edit:
+            ed_reg_name = edit_carbon_regulations['edited_rows'][0].get('regulation_name')
+            ed_reg_desc = edit_carbon_regulations['edited_rows'][0].get('description')
+        else:
+            ed_reg_name = None
+            ed_reg_desc = None
+        edit_carbon_regulations['added_rows'].append({"regulation_name": ed_reg_name,"description": ed_reg_desc})
+        edit_carbon_regulations['edited_rows'] = {}
+        st.write(edit_carbon_regulations)
+    else:
+        carbon_regulations = pd.DataFrame(carbon_regulations)
+        carbon_regulations.sort_values(by=['id'], inplace=True, ignore_index=True)
         
-    carbon_regulations = pd.DataFrame(carbon_regulations)
-    carbon_regulations.sort_values(by=['id'], inplace=True, ignore_index=True)
-    
-    carbon_regulations_col = ['id'] + [col for col in carbon_regulations.columns.values if col != 'id']
-    carbon_regulations = carbon_regulations[carbon_regulations_col]    
+        carbon_regulations_col = ['id'] + [col for col in carbon_regulations.columns.values if col != 'id']
+        carbon_regulations = carbon_regulations[carbon_regulations_col]    
 
-    carbon_regulations_col_ed = st.experimental_data_editor(carbon_regulations, hide_index=True, num_rows="dynamic", disabled=["id"], key="edit_carbon_regulations")
-    
-    edit_carbon_regulations = st.session_state["edit_carbon_regulations"]
-    # st.write(st.session_state["edit_company"]) # 👈 Show the value in Session State
-
+        carbon_regulations_col_ed = st.experimental_data_editor(carbon_regulations, hide_index=True, num_rows="dynamic", disabled=["id"], key="edit_carbon_regulations")
         
-    if st.button('Update Company Data'):
+        edit_carbon_regulations = st.session_state["edit_carbon_regulations"]
+        # st.write(st.session_state["edit_company"]) # 👈 Show the value in Session State
+
+            
+    if st.button('Update Carbon Regulations Data'):
         if len(edit_carbon_regulations['added_rows']) > 0:
             post_carbon_regulations(edit_carbon_regulations['added_rows'])
         
+        if len(edit_carbon_regulations['edited_rows']) > 0:
+            put_carbon_regulations(edit_carbon_regulations['edited_rows'])
+            
+
     
     
+        st.session_state.pop('edit_carbon_regulations', None)
 #     curl -X 'GET' \
 #   'http://localhost:8001/regulations/?skip=0&limit=100' \
 #   -H 'accept: application/json'
