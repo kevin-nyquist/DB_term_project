@@ -113,10 +113,10 @@ if sel_table == 'branches':
         st.session_state.pop('edit_branches', None)
         
 
-if sel_table == 'carbon_offsets':
-    st.subheader('Carbon Offset')  
+# if sel_table == 'carbon_offsets':
+#     st.subheader('Carbon Offset')  
     
     
     
-      'http://localhost:8001/companies/1/carbon_offsets/?skip=0&limit=100' \
+#       'http://localhost:8001/companies/1/carbon_offsets/?skip=0&limit=100' \
 #
