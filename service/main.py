@@ -321,11 +321,11 @@ def get_carbon_footprints(source_id: int, db: Session = Depends(get_db), skip: i
     Raises:
         HTTPException: If the carbon emissions source with the given ID is not found.
     """
-    db_footprint = crud.get_carbon_footprint(db, source_id=source_id)
-    if db_footprint is None:
-        raise HTTPException(status_code=400, detail="Emissions source not found")
-    company_branches = crud.get_carbon_footprints(db=db, source_id=source_id, skip=skip, limit=limit)
-    return company_branches
+    db_emission_source = crud.get_carbon_emissions_source(db, source_id=source_id)
+    if db_emission_source is None:
+        raise HTTPException(status_code=400, detail="No footprints found")
+    carbon_footprints = crud.get_carbon_footprints(db=db, source_id=source_id, skip=skip, limit=limit)
+    return carbon_footprints
 
 @app.post("/emissionssource/", response_model=schemas.CarbonEmissionsSource)
 def create_carbon_emissions_source(source: schemas.CarbonEmissionsSourceCreate, db: Session = Depends(get_db)):
@@ -362,7 +362,7 @@ def create_carbon_footprint(footprint: schemas.CarbonFootprintCreate, db: Sessio
     Raises:
         HTTPException: If the emissions source with the given ID is not found.
     """
-    db_emission_sources = crud.get_carbon_emissions_sources(db, source_id=footprint.source_id)
+    db_emission_sources = crud.get_carbon_emissions_sources_by_id(db, source_id=footprint.source_id)
     if db_emission_sources is None:
         raise HTTPException(status_code=400, detail="Emissions source not found")
     
@@ -423,7 +423,7 @@ def create_carbon_sequestration(sequestration: schemas.CarbonSequestrationCreate
     Raises:
         HTTPException: If the emissions source with the given ID is not found.
     """
-    db_emission_sources = crud.get_carbon_emissions_sources(db, source_id=sequestration.source_id)
+    db_emission_sources = crud.get_carbon_emissions_sources_by_id(db, source_id=sequestration.source_id)
     if db_emission_sources is None:
         raise HTTPException(status_code=400, detail="Emissions source not found")
     

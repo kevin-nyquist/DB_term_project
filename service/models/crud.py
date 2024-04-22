@@ -134,7 +134,7 @@ def delete_branch(db: Session, branch_id: int):
 def get_carbon_emissions_sources(db: Session, branch_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.branch_id == branch_id).offset(skip).limit(limit).all()
 
-def get_carbon_emissions_sources(db: Session, source_id: int, skip: int = 0, limit: int = 100):
+def get_carbon_emissions_sources_by_id(db: Session, source_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.id == source_id).offset(skip).limit(limit).all()
 
 
@@ -199,7 +199,7 @@ def get_regulation_by_name(db: Session, regulation_name: str):
     return db.query(models.Company).filter(models.CarbonRegulation.regulation_name == regulation_name).first()
 
 
-def get_carbon_footprints(db: Session, source_id: int):
+def get_carbon_footprints(db: Session, source_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonFootprint).filter(models.CarbonFootprint.source_id == source_id).offset(skip).limit(limit).all()
 
 
