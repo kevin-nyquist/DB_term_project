@@ -1,6 +1,7 @@
 from http.client import HTTPException
 from sqlalchemy.orm import Session
 from models import models, schemas
+from sqlalchemy import func as F
 
 # gets company from company ID
 def get_company_by_cid(db: Session, company_id: int):
@@ -30,7 +31,7 @@ def update_company(db: Session, company_id: int, company_update: schemas.Company
         db.commit()
         db.refresh(company)
         return company
-    
+
 def delete_company(db: Session, company_id: int):
     company = db.query(models.Company).filter(models.Company.id == company_id).first()
     if company:
@@ -98,7 +99,7 @@ def get_company_branch(db: Session, branch_id: int):
 # Not currently possible: gets the specified company from the branch ID
 # def get_company_by_bid(db: Session, branch_id: int):
 #     branch = db.query(models.CompanyBranch).filter(models.CompanyBranch.id == branch_id).first()
-#     if branch is None: 
+#     if branch is None:
 #         raise HTTPException(status_code=400, detail="There are no associated companies with this branch ID")
 #     return branch.company
 
@@ -122,7 +123,7 @@ def update_branch(db: Session, branch_id: int, branch_update: schemas.CompanyBra
         db.commit()
         db.refresh(branch)
         return branch
-    
+
 def delete_branch(db: Session, branch_id: int):
     branch = db.query(models.CompanyBranch).filter(models.CompanyBranch.id == branch_id).first()
     if branch:
@@ -193,7 +194,7 @@ def update_regulation(db: Session, regulation_id: int, regulation_update: schema
         db.refresh(regulation)
         return regulation
     return None
-    
+
 
 def get_regulation_by_name(db: Session, regulation_name: str):
     return db.query(models.Company).filter(models.CarbonRegulation.regulation_name == regulation_name).first()
@@ -410,7 +411,7 @@ def get_company_summary(db: Session, company_id: int):
         "total_emissions": total_emissions,
         "total_sequestrations": total_sequestrations
     }
-    
+
 def get_branch_summary(db: Session, branch_id: int):
     """
     Get a summary of a branch's carbon emissions and sequestrations.
@@ -439,4 +440,36 @@ def get_branch_summary(db: Session, branch_id: int):
     return {
         "total_emissions": total_emissions,
         "total_sequestrations": total_sequestrations
+    }
+
+def get_companies_summaries(db:Session):
+    footprints = (
+        (
+            db.query(
+                models.Company.id,
+                F.sum(models.CarbonFootprint.footprint_value).label("total_footprint"),
+            )
+            .join(models.CompanyBranch)
+            .join(models.CarbonEmissionsSource)
+            .join(models.CarbonFootprint)
+        )
+        .group_by(models.Company.id)
+        .all()
+    )
+    sequestrations = (
+        (
+            db.query(
+                models.Company.id,
+                F.sum(models.CarbonSequestration.seq_value).label("total_seq"),
+            )
+            .join(models.CompanyBranch)
+            .join(models.CarbonEmissionsSource)
+            .join(models.CarbonSequestration)
+        )
+        .group_by(models.Company.id)
+        .all()
+    )
+    return {
+        "footprints": {company_id: total_footprint for company_id, total_footprint in footprints},
+        "sequestrations": {company_id: total_seq for company_id, total_seq in sequestrations},
     }
