@@ -3,8 +3,10 @@ import yaml
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
 from time import sleep
+from utils import const_variable as cv
 
 
+st.header(cv.project_title, divider=cv.header_color)
 
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
