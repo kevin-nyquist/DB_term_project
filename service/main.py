@@ -573,5 +573,18 @@ def get_branch_summary(branch_id: int, db: Session = Depends(get_db)):
     """
     return crud.get_branch_summary(db, branch_id=branch_id)
 
+@router.get("/companies/summary")
+def get_companies_summaries(db: Session = Depends(get_db)):
+    """
+    Get a summary of all companies' carbon emissions and offsets.
+
+    Args:
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: A dictionary containing all companies' carbon emissions and offsets.
+    """
+    return crud.get_companies_summaries(db)
+
 
 app.include_router(router)
