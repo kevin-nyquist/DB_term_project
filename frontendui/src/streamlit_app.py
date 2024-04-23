@@ -28,7 +28,7 @@ authenticator = stauth.Authenticate(
 )
 
 
-st.page_link("pages/page3.py", label='registeration', icon='🏠')
+
 
 # if not st.session_state["authentication_status"]:
 authenticator.login()
@@ -36,14 +36,30 @@ authenticator.login()
 
 if st.session_state["authentication_status"]:
     st.write(f'Welcome *{st.session_state["name"]}*')
-    st.title('Some content')
-    st.page_link("pages/page1.py", label=cv.page1_title, icon=cv.page1_icon)
-    st.page_link("pages/page2.py", label=cv.page2_title, icon=cv.page2_icon)
-    authenticator.logout()
+    st.title('Dashboard')
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button(cv.page1_title, type="secondary"):
+            st.switch_page(cv.page1_address)
+        # st.page_link("pages/page1.py", label=cv.page1_title, icon=cv.page1_icon)
+    with col2:
+        if st.button(cv.page2_title, type="secondary"):
+            st.switch_page(cv.page2_address)        
+        # st.page_link("pages/page2.py", label=cv.page2_title, icon=cv.page2_icon)
+    # with col3:
+    #     if st.button(cv.page3_title, type="secondary"):
+    #         st.switch_page(cv.page3_address)
+    with col3:
+        authenticator.logout()
 elif st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 elif st.session_state["authentication_status"] is None:
     st.warning('Please enter your username and password')
+
+    st.write("Not a member yet? Sign up now!")
+    if st.button("Sign up", type="secondary"):
+        st.switch_page("pages/register.py")
+
 
 
 
