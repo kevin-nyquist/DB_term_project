@@ -24,6 +24,10 @@ try:
     email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(pre_authorization=False)
     if email_of_registered_user:
         st.success('User registered successfully')
+        
+        with open('config.yaml', 'w') as file:
+            yaml.dump(config, file, default_flow_style=False)
+        
         sleep(1)
         st.switch_page("streamlit_app.py")
 except Exception as e:

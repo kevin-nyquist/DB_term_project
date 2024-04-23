@@ -24,7 +24,7 @@ def make_sidebar():
         if st.session_state.get('authentication_status', False):
             st.page_link(cv.page1_address, label=cv.page1_title, icon=cv.page1_icon)
             st.page_link(cv.page2_address, label=cv.page2_title, icon=cv.page2_icon)
-            st.page_link(cv.page3_address, label=cv.page3_title, icon=cv.page3_icon)
+            # st.page_link(cv.page3_address, label=cv.page3_title, icon=cv.page3_icon)
 
 
             st.write("")

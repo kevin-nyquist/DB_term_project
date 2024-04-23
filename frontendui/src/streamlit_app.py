@@ -37,7 +37,7 @@ authenticator.login()
 if st.session_state["authentication_status"]:
     st.write(f'Welcome *{st.session_state["name"]}*')
     st.title('Dashboard')
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
     with col1:
         if st.button(cv.page1_title, type="secondary"):
             st.switch_page(cv.page1_address)
@@ -46,10 +46,10 @@ if st.session_state["authentication_status"]:
         if st.button(cv.page2_title, type="secondary"):
             st.switch_page(cv.page2_address)        
         # st.page_link("pages/page2.py", label=cv.page2_title, icon=cv.page2_icon)
+    # with col3:
+    #     if st.button(cv.page3_title, type="secondary"):
+    #         st.switch_page(cv.page3_address)
     with col3:
-        if st.button(cv.page3_title, type="secondary"):
-            st.switch_page(cv.page3_address)
-    with col4:
         authenticator.logout()
 elif st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')

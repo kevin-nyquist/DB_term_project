@@ -523,26 +523,27 @@ if sel_table == 'carbon_sequestration':
 
 ## ------------ Footprints ------------
 def post_footprints(added_rows):
-    st.write("API has not been implemented yet")
-    # headers = {'accept': 'application/json','Content-Type': 'application/json'}
-    # for added_row in added_rows:
-    #         req = requests.post(f'http://service:80/footprints', headers=headers, json=added_row)
-    #         if req.status_code == 200:
-    #             st.write(f"Added footprint with footprint_name: {added_row['footprint_name']}")
-    #         else:
-    #             st.write(f"Failed to add footprint with footprint_name: {added_row['footprint_name']}")
+    # st.write(added_rows)
+    headers = {'accept': 'application/json','Content-Type': 'application/json'}
+    for added_row in added_rows:
+            req = requests.post(f'http://service:80/footprint', headers=headers, json=added_row)
+            if req.status_code == 200:
+                st.write(f"Added the footprint data.")
+            else:
+                st.write(f"Failed to add the footprint data.")
 
-def put_footprints(edited_rows):
-    st.write("API has not been implemented yet")
-    # headers = {'accept': 'application/json','Content-Type': 'application/json'}
-    # for row_idx in edited_rows:
-    #     f_id = edited_rows.loc[row_idx,['id']].values[0]
-    #     updated_row = edited_rows[row_idx]
-    #     req = requests.put(f'http://service:80/footprint/{f_id}', headers=headers, json=updated_row)
-    #     if req.status_code == 200:
-    #         st.write(f"Updated footprint with id: {f_id}")
-    #     else:
-    #         st.write(f"Failed to update footprint with id: {f_id}, code: {req.status_code}")
+def put_footprints(edited_rows, footprints):
+    headers = {'accept': 'application/json','Content-Type': 'application/json'}
+    # st.write(edited_rows)
+    for row_idx in edited_rows:
+        f_id = footprints.loc[row_idx,['id']].values[0]
+        updated_row = edited_rows[row_idx]
+        req = requests.put(f'http://service:80/carbon_footprint/{f_id}', headers=headers, json=updated_row)
+        if req.status_code == 200:
+            st.write(f"Updated footprint with id: {f_id}")
+        else:
+            st.write(f"Failed to update footprint with id: {f_id}, code: {req.status_code}")
+ 
      
 def delete_footprints(deleted_rows, footprints):
     for row_idx in deleted_rows:
@@ -626,7 +627,8 @@ if sel_table == 'footsprints':
             post_footprints(edit_carbon_offset_data['added_rows'])
         
         if len(edit_carbon_offset_data['edited_rows']) > 0:
-            put_footprints(edit_carbon_offset_data['edited_rows'])
+            put_footprints(edit_carbon_offset_data['edited_rows'],
+                                       footprints)
         
         if len(edit_carbon_offset_data['deleted_rows']) > 0:
             delete_footprints(edit_carbon_offset_data['deleted_rows'],
