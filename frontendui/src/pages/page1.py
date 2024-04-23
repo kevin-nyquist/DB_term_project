@@ -3,6 +3,7 @@ import streamlit as st
 import requests
 from utils import const_variable as cv
 import pandas as pd
+import matplotlib.pyplot as plt
 
 st.header(cv.project_title, divider=cv.header_color)
 make_sidebar()
@@ -15,7 +16,32 @@ st.write(
 """
 )
 
+st.markdown('____')
+st.write("## A Summary of all Companies:")
+def make_pie_plot(data: dict[str, float], title):
+    labels = list(data.keys())
+    y = list(data.values()) 
+    fig, ax = plt.subplots()
+    ax.pie(y, labels=labels)    
+    plt.title(title)
+    return fig, ax   
+    
 
+all_company_summary = requests.get("http://service:80/companies/summary").json()
+
+
+col01, col02 = st.columns(2)
+with col01:
+    fig, ax = make_pie_plot(data = all_company_summary["sequestrations"], title = "Sequestrations")
+    st.pyplot(fig) 
+with col02:
+    fig, ax = make_pie_plot(data = all_company_summary["footprints"], title = "Footprints")
+    st.pyplot(fig) 
+
+
+
+st.markdown('____')
+st.write("## Total Information of a Company")
 col1, col2 = st.columns(2)
 
 with col1:
@@ -47,12 +73,10 @@ number_of_branches = len(company_branches)
 
 company_summary = requests.get(f"http://service:80/company/{sel_comp_id}/summary/").json()
 
-st.write("## Total Information of the Company")
-st.markdown('____')
 company_info = {"Company Name": sel_comp_name, 
                 "Company ID": sel_comp_id, 
                 "Total number of branches": number_of_branches,
-                "Total Carbon Emissions": company_summary["total_emissions"],
+                "Total Carbon Footprints": company_summary["total_emissions"],
                 "Total Sequestrations": company_summary["total_sequestrations"],
                 "Total Carbon Offsets": carbon_offsets["offset_amount"].sum(),
                 }
@@ -69,8 +93,8 @@ st.markdown(carbon_offsets.style.hide(axis="index").to_html(), unsafe_allow_html
 
 st.write(" ")
 st.write(" ")
-st.write("## Total Information of the Branch")
 st.markdown('____')
+st.write("## Total Information of a Branch")
 
 
 branch_summary = requests.get(f"http://service:80/baranch/{sel_branch_id}/summary/").json()
@@ -79,7 +103,7 @@ branch_summary = requests.get(f"http://service:80/baranch/{sel_branch_id}/summar
 branch_info = {"Branch Name": sel_branch_name, 
                 "Branch ID": sel_branch_id, 
                 # "Total number of branches": number_of_branches,
-                "Total Carbon Emissions": branch_summary["total_emissions"],
+                "Total Carbon Footprints": branch_summary["total_emissions"],
                 "Total Sequestrations": branch_summary["total_sequestrations"],
                 # "Total Carbon Offsets": carbon_offsets["offset_amount"].sum(),
                 }
