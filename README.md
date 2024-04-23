@@ -1,5 +1,7 @@
 # DB_term_project
 
+## All information related to the database design are present in 'DBMS Term Project.pptx'
+
 To initialize the project, run this command (you need --build for the first time):
 
 ```python
@@ -17,11 +19,7 @@ By updating the code, services have to reload, so it is not necessary to restart
 ## Database
 ### Postgres
 We are using `SQLAlchemy` as our ORM and `Alembic` as our migration tool.  
-You need to make a database called `dbproject`. For doing this you can run the following command inside the postgres docker container:
-```bash
-psql # this opens postgres CLI
-CREATE DATABASE dbproject;
-```
+
 ### Migrations
 After creating the database, you need to apply the migrations using `Alembic`. You can do it with the following command inside the `models` folder: 
 ```bash
