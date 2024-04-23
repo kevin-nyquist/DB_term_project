@@ -3,7 +3,7 @@ class const_variable:
     header_color = 'green'
     side_bar_title = 'Carbon Analytics Dashboard'
     app_description = "Our application is a carbon emission analytics platform that provides a foundation for the storage and management of a company’s carbon emissions data. This includes tracking emissions, carbon offsets and sequestration, carbon footprints, and emissions regulations according to specific regions where the company operates. Our system takes into account the net carbon emissions of all company operations in different regions to give insight into how the company can better manage their resources and reduce carbon emissions to help reach future goals of Net Zero."
-    page1_title = "CO2 Emissions"
+    page1_title = "CO2 Analysis"
     page1_icon = "📈"
     page1_description = "In this page we will analyze the carbon emissions of a company. We will look at the carbon emissions of the company in different regions and compare them to the company's carbon emissions goals. We will also look at the company's carbon emissions over time and see how they have changed."
     page1_address = "pages/page1.py"

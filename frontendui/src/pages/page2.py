@@ -22,6 +22,9 @@ sel_table = st.selectbox(
     ["companies", "branches", "carbon_offsets", "carbon_emissions_sources", "carbon_regulations", "carbon_sequestration", "footsprints"])
 
 st.markdown('____')
+
+## ------------ companies ------------
+
 if sel_table == 'companies':
     st.subheader('Company')       
     company = requests.get("http://service:80/companies/").json()
@@ -62,6 +65,10 @@ if sel_table == 'companies':
         
         st.session_state.pop('edit_company', None)
         
+## ------------ companies ------------
+
+
+## ------------ branches ------------
 
 if sel_table == 'branches':
     st.subheader('Branch')       
@@ -124,6 +131,11 @@ if sel_table == 'branches':
         
         st.session_state.pop('edit_branches', None)
         
+## ------------ branches ------------
+
+        
+        
+## ------------ carbon_offsets ------------        
 
 if sel_table == 'carbon_offsets':
     st.subheader('Carbon Offset')  
@@ -194,43 +206,118 @@ if sel_table == 'carbon_offsets':
 
         st.session_state.pop('edit_carbon_offset', None)
         
-# if sel_table == 'carbon_emissions_sources':
-    # st.subheader('Carbon Emissions Sources') 
-    
-    # col1, col2 = st.columns(2)
-    
-    # with col1:
-    #     company = requests.get("http://service:80/companies/").json()
-    #     if len(company) == 0:
-    #         st.write(f"No companies found")
-    #         st.stop()
-    #     company = pd.DataFrame(company)
-    #     company_name = sorted(company["c_name"].tolist())
+        
+## ------------ carbon_offsets ------------        
+   
+        
+## ------------ carbon_emissions_sources ------------
 
-    #     sel_comp_name = st.selectbox(
-    #         'Select a Company:',
-    #         company_name)
-    #     sel_comp_id = company[company["c_name"] == sel_comp_name]["id"].values[0]
     
-    # with col2:
-    #     branches = requests.get(f"http://service:80/companies/{sel_comp_id}/branches").json()
-    #     if len(branches) == 0:
-    #         st.write(f"No branches found for company: {sel_comp_name}")
-    #         st.stop()
-    #     branches = pd.DataFrame(branches)
-    #     branches.sort_values(by=['id'], inplace=True, ignore_index=True)
-    #     branches_col = ['id'] + [col for col in branches.columns.values if col != 'id']
-    #     branches = branches[branches_col] 
-    #     branch_name = sorted(branches["branch_name"].tolist())
+def post_emissionssources(added_rows):
+    st.write("API has not been implemented yet")
 
-    #     sel_branch_name = st.selectbox(
-    #         'Select a Branch:',
-    #         branch_name)
-    #     sel_branch_id = branches[branches["branch_name"] == sel_branch_name]["id"].values[0]
+def put_emissionssources(edited_rows, source_data):
+    headers = {'accept': 'application/json','Content-Type': 'application/json'}
+    # select other info from the source_data if they are not in the edited_rows
+    for row_idx in edited_rows:
+        org_row = source_data.loc[row_idx,:].to_dict()
+        es_id = org_row.get('id')
+        updated_row = edited_rows[row_idx]
+        # st.write(updated_row)
+        # st.write(org_row)
+        put_data = {"source_type":updated_row.get("source_type") if "source_type" in updated_row.keys() else org_row.get("source_type"),
+                    "total_emission_value":updated_row.get("total_emission_value") if "total_emission_value" in updated_row.keys() else org_row.get("total_emission_value"),
+                    }
+        # st.write(put_data)
+        # st.write(es_id)
+        req = requests.put(f'http://service:80/emissionssource/{es_id}', headers=headers, json=put_data)
+        if req.status_code == 200:
+            st.write(f"Updated emission source with id: {es_id}")
+        else:
+            st.write(f"Failed to update emission source with id: {es_id}, code: {req.status_code}")
+
+def delete_emissionssources(deleted_rows, source_data):
+    for row_idx in deleted_rows:
+        es_id = source_data.loc[row_idx,['id']].values[0]
+        req = requests.delete(f'http://service:80/emissionssource/{es_id}', headers={'accept': 'application/json'})
+        if req.status_code == 200:
+            st.write(f"Deleted emission source with id: {es_id}")
+        else:
+            st.write(f"Failed to delete emission source with id: {es_id}")
+
+  
+        
+if sel_table == 'carbon_emissions_sources':
+    st.subheader('Carbon Emissions Sources') 
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        company = requests.get("http://service:80/companies/").json()
+        if len(company) == 0:
+            st.write(f"No companies found")
+            st.stop()
+        company = pd.DataFrame(company)
+        company_name = sorted(company["c_name"].tolist())
+
+        sel_comp_name = st.selectbox(
+            'Select a Company:',
+            company_name)
+        sel_comp_id = company[company["c_name"] == sel_comp_name]["id"].values[0]
+    
+    with col2:
+        branches = requests.get(f"http://service:80/companies/{sel_comp_id}/branches").json()
+        if len(branches) == 0:
+            st.write(f"No branches found for company: {sel_comp_name}")
+            st.stop()
+        branches = pd.DataFrame(branches)
+        branches.sort_values(by=['id'], inplace=True, ignore_index=True)
+        branches_col = ['id'] + [col for col in branches.columns.values if col != 'id']
+        branches = branches[branches_col] 
+        branch_name = sorted(branches["branch_name"].tolist())
+
+        sel_branch_name = st.selectbox(
+            'Select a Branch:',
+            branch_name)
+        sel_branch_id = branches[branches["branch_name"] == sel_branch_name]["id"].values[0]
         
     # st.write(f"Selected Company: {sel_comp_name}, Selected Branch: {sel_branch_name}")
+      
+    emissionssources = requests.get(f"http://service:80/branch/{sel_branch_id}/emissionssources/").json()
+    # st.write(emissionssources)
+      
+    if len(emissionssources) == 0:
+        st.write(f"No emissionssources found for the branch: {sel_branch_name}")
+        st.stop()
+    emissionssources = pd.DataFrame(emissionssources)
+    emissionssources.sort_values(by=['id'], inplace=True, ignore_index=True)
+    emissionssources_col = ['id'] + [col for col in emissionssources.columns.values if col != 'id']
+    emissionssources = emissionssources[emissionssources_col]   
+    emissionssources_ed = st.experimental_data_editor(emissionssources, hide_index=True, num_rows="dynamic", disabled=["id", "branch_id"], key="edit_emissionssources")
+    
+    edit_carbon_offset_data = st.session_state["edit_emissionssources"]
+ 
+    
+
+    if st.button('Update Emissions Source Data'):
+        if len(edit_carbon_offset_data['added_rows']) > 0:
+            post_emissionssources(edit_carbon_offset_data['added_rows'])
         
+        if len(edit_carbon_offset_data['edited_rows']) > 0:
+            put_emissionssources(edit_carbon_offset_data['edited_rows'],
+                                 emissionssources)
         
+        if len(edit_carbon_offset_data['deleted_rows']) > 0:
+            delete_emissionssources(edit_carbon_offset_data['deleted_rows'],
+                                      emissionssources)
+
+
+
+## ------------ carbon_emissions_sources ------------
+       
+        
+## ------------ Carbon Regulations ------------
+
 def post_carbon_regulations(added_rows):
     headers = {'accept': 'application/json','Content-Type': 'application/json'}
     for added_row in added_rows:
@@ -241,13 +328,35 @@ def post_carbon_regulations(added_rows):
                 st.write(f"Failed to add regulation with regulation_name: {added_row['regulation_name']}")
 
 def put_carbon_regulations(edited_rows):
-    for row_idx in edited_rows:
-        c_id = company.loc[row_idx,['id']].values[0]
-        updated_row = edit_company_data['edited_rows'][row_idx]
-        req = requests.put(f'http://service:80/company/{c_id}', headers=headers, json=updated_row)
-        if req.status_code == 200:
-            st.write(f"Updated company with id: {c_id}, c_name: {updated_row['c_name']}")
+    st.write("API has not been implemented yet")
+    # st.write(edited_rows)
+    # for row_idx in edited_rows:
+    #     cr_id = edited_rows.loc[row_idx,['id']].values[0]
+    #     updated_row = edited_rows[row_idx]
+    #     req = requests.put(f'http://service:80/regulation/{cr_id}', headers=headers, json=updated_row)
+    #     if req.status_code == 200:
+    #         st.write(f"Updated regulation with id: {cr_id}")
+    #     else:
+    #         st.write(f"Failed to update regulation with id: {cr_id}, code: {req.status_code}")
+     
+    # curl -X 'PUT' \
+    #   'http://localhost:8001/regulation/2' \
+    #   -H 'accept: application/json' \
+    #   -H 'Content-Type: application/json' \
+    #   -d '{
+    #   "regulation_name": "string",
+    #   "description": "string"
+    # }'     
                                 
+
+def delete_carbon_regulations(deleted_rows, carbon_regulations):
+    for row_idx in deleted_rows:
+        cr_id = carbon_regulations.loc[row_idx,['id']].values[0]
+        req = requests.delete(f'http://service:80/regulation/{cr_id}', headers={'accept': 'application/json'})
+        if req.status_code == 200:
+            st.write(f"Deleted regulation with id: {cr_id}")
+        else:
+            st.write(f"Failed to delete regulation with id: {cr_id}")
 
 if sel_table == 'carbon_regulations':
     st.subheader("Carbon Regulations")
@@ -287,21 +396,243 @@ if sel_table == 'carbon_regulations':
         
         if len(edit_carbon_regulations['edited_rows']) > 0:
             put_carbon_regulations(edit_carbon_regulations['edited_rows'])
+        
+        if len(edit_carbon_regulations['deleted_rows']) > 0:
+            delete_carbon_regulations(edit_carbon_regulations['deleted_rows'],
+                                      carbon_regulations)
             
 
-    
-    
         st.session_state.pop('edit_carbon_regulations', None)
-#     curl -X 'GET' \
-#   'http://localhost:8001/regulations/?skip=0&limit=100' \
-#   -H 'accept: application/json'
+## ------------ Carbon Regulations ------------
+
+
+## ------------ Carbon Sequestration ------------
+def post_sequestration(added_rows):
+    headers = {'accept': 'application/json','Content-Type': 'application/json'}
+    for added_row in added_rows:
+            req = requests.post(f'http://service:80/sequestration', headers=headers, json=added_row)
+            if req.status_code == 200:
+                st.write(f"Added sequestration!")
+            else:
+                st.write(f"Failed to add sequestration!")
+
+
+def put_sequestration(edited_rows):
+    st.write("API has not been implemented yet")
+    # headers = {'accept': 'application/json','Content-Type': 'application/json'}
+    # for row_idx in edited_rows:
+    #     f_id = edited_rows.loc[row_idx,['id']].values[0]
+    #     updated_row = edited_rows[row_idx]
+    #     req = requests.put(f'http://service:80/footprint/{f_id}', headers=headers, json=updated_row)
+    #     if req.status_code == 200:
+    #         st.write(f"Updated footprint with id: {f_id}")
+    #     else:
+    #         st.write(f"Failed to update footprint with id: {f_id}, code: {req.status_code}")
+     
+def delete_sequestration(deleted_rows, sequestration):
+    for row_idx in deleted_rows:
+        s_id = sequestration.loc[row_idx,['id']].values[0]
+        req = requests.delete(f'http://service:80/carbon_sequestration/{s_id}', headers={'accept': 'application/json'})
+        if req.status_code == 200:
+            st.write(f"Deleted sequestration with id: {s_id}")
+        else:
+            st.write(f"Failed to delete sequestration with id: {s_id}")
+
+
+
+if sel_table == 'carbon_sequestration':
+    st.subheader("Carbon Sequestration")
+
+    col1, col2, col3 = st.columns(3)
     
+    with col1:
+        company = requests.get("http://service:80/companies/").json()
+        if len(company) == 0:
+            st.write(f"No companies found")
+            st.stop()
+        company = pd.DataFrame(company)
+        company_name = sorted(company["c_name"].tolist())
+
+        sel_comp_name = st.selectbox(
+            'Select a Company:',
+            company_name)
+        sel_comp_id = company[company["c_name"] == sel_comp_name]["id"].values[0]
     
-#     curl -X 'POST' \
-#   'http://localhost:8001/regulations/' \
-#   -H 'accept: application/json' \
-#   -H 'Content-Type: application/json' \
-#   -d '{
-#   "regulation_name": "test",
-#   "description": "test"
-# }'
+    with col2:
+        branches = requests.get(f"http://service:80/companies/{sel_comp_id}/branches").json()
+        if len(branches) == 0:
+            st.write(f"No branches found for company: {sel_comp_name}")
+            st.stop()
+        branches = pd.DataFrame(branches)
+        branches.sort_values(by=['id'], inplace=True, ignore_index=True)
+        branches_col = ['id'] + [col for col in branches.columns.values if col != 'id']
+        branches = branches[branches_col] 
+        branch_name = sorted(branches["branch_name"].tolist())
+
+        sel_branch_name = st.selectbox(
+            'Select a Branch:',
+            branch_name)
+        sel_branch_id = branches[branches["branch_name"] == sel_branch_name]["id"].values[0]
+        
+    with col3:
+        emissionssources = requests.get(f"http://service:80/branch/{sel_branch_id}/emissionssources").json()
+        if len(emissionssources) == 0:
+            st.write(f"No emissionssources found for the branch: {sel_branch_name}")
+            st.stop()
+        emissionssources = pd.DataFrame(emissionssources)
+        emissionssources.sort_values(by=['id'], inplace=True, ignore_index=True)
+        emissionssources_col = ['id'] + [col for col in emissionssources.columns.values if col != 'id']
+        emissionssources = emissionssources[emissionssources_col]
+        emissionssources_name = [str(j)+"_"+i for i,j in zip(emissionssources["source_type"].tolist(), emissionssources["id"].tolist())]
+   
+        sel_emissionssource_name = st.selectbox(
+            'Select an Emission Source:',
+            emissionssources_name)
+        sel_emissionssource_id = emissionssources[emissionssources["id"] == int(sel_emissionssource_name.split("_")[0])]["id"].values[0]
+    
+        
+    # st.write(f"Selected Company: {sel_comp_name}, Selected Branch: {sel_branch_name}", f"Selected Emission Source: {sel_emissionssource_name}")
+      
+    sequestration = requests.get(f"http://service:80/emissionssource/{sel_emissionssource_id}/sequestrations/").json()
+
+    if len(sequestration) == 0:
+        st.write(f"No sequestration found for the emissionssource: {sel_emissionssource_name}")
+        st.stop()
+    sequestration = pd.DataFrame(sequestration)
+    sequestration.sort_values(by=['id'], inplace=True, ignore_index=True)
+    sequestration_col = ['id'] + [col for col in sequestration.columns.values if col != 'id']
+    sequestration = sequestration[sequestration_col]   
+    sequestration_ed = st.experimental_data_editor(sequestration, hide_index=True, num_rows="dynamic", disabled=["id"], key="edit_sequestration")
+    
+    edit_sequestration_data = st.session_state["edit_sequestration"]
+    
+    if st.button('Update Sequestration Data'):
+        if len(edit_sequestration_data['added_rows']) > 0:
+            post_sequestration(edit_sequestration_data['added_rows'])
+        
+        if len(edit_sequestration_data['edited_rows']) > 0:
+            put_sequestration(edit_sequestration_data['edited_rows'])
+        
+        if len(edit_sequestration_data['deleted_rows']) > 0:
+            delete_sequestration(edit_sequestration_data['deleted_rows'],
+                                      sequestration) 
+
+
+## ------------ Carbon Sequestration ------------
+
+
+## ------------ Footprints ------------
+def post_footprints(added_rows):
+    st.write("API has not been implemented yet")
+    # headers = {'accept': 'application/json','Content-Type': 'application/json'}
+    # for added_row in added_rows:
+    #         req = requests.post(f'http://service:80/footprints', headers=headers, json=added_row)
+    #         if req.status_code == 200:
+    #             st.write(f"Added footprint with footprint_name: {added_row['footprint_name']}")
+    #         else:
+    #             st.write(f"Failed to add footprint with footprint_name: {added_row['footprint_name']}")
+
+def put_footprints(edited_rows):
+    st.write("API has not been implemented yet")
+    # headers = {'accept': 'application/json','Content-Type': 'application/json'}
+    # for row_idx in edited_rows:
+    #     f_id = edited_rows.loc[row_idx,['id']].values[0]
+    #     updated_row = edited_rows[row_idx]
+    #     req = requests.put(f'http://service:80/footprint/{f_id}', headers=headers, json=updated_row)
+    #     if req.status_code == 200:
+    #         st.write(f"Updated footprint with id: {f_id}")
+    #     else:
+    #         st.write(f"Failed to update footprint with id: {f_id}, code: {req.status_code}")
+     
+def delete_footprints(deleted_rows, footprints):
+    for row_idx in deleted_rows:
+        f_id = footprints.loc[row_idx,['id']].values[0]
+        req = requests.delete(f'http://service:80/carbon_footprint/{f_id}', headers={'accept': 'application/json'})
+        if req.status_code == 200:
+            st.write(f"Deleted footprint with id: {f_id}")
+        else:
+            st.write(f"Failed to delete footprint with id: {f_id}")
+
+
+
+if sel_table == 'footsprints':
+    st.subheader("Carbon Footprints")
+
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        company = requests.get("http://service:80/companies/").json()
+        if len(company) == 0:
+            st.write(f"No companies found")
+            st.stop()
+        company = pd.DataFrame(company)
+        company_name = sorted(company["c_name"].tolist())
+
+        sel_comp_name = st.selectbox(
+            'Select a Company:',
+            company_name)
+        sel_comp_id = company[company["c_name"] == sel_comp_name]["id"].values[0]
+    
+    with col2:
+        branches = requests.get(f"http://service:80/companies/{sel_comp_id}/branches").json()
+        if len(branches) == 0:
+            st.write(f"No branches found for company: {sel_comp_name}")
+            st.stop()
+        branches = pd.DataFrame(branches)
+        branches.sort_values(by=['id'], inplace=True, ignore_index=True)
+        branches_col = ['id'] + [col for col in branches.columns.values if col != 'id']
+        branches = branches[branches_col] 
+        branch_name = sorted(branches["branch_name"].tolist())
+
+        sel_branch_name = st.selectbox(
+            'Select a Branch:',
+            branch_name)
+        sel_branch_id = branches[branches["branch_name"] == sel_branch_name]["id"].values[0]
+        
+    with col3:
+        emissionssources = requests.get(f"http://service:80/branch/{sel_branch_id}/emissionssources").json()
+        if len(emissionssources) == 0:
+            st.write(f"No emissionssources found for the branch: {sel_branch_name}")
+            st.stop()
+        emissionssources = pd.DataFrame(emissionssources)
+        emissionssources.sort_values(by=['id'], inplace=True, ignore_index=True)
+        emissionssources_col = ['id'] + [col for col in emissionssources.columns.values if col != 'id']
+        emissionssources = emissionssources[emissionssources_col]
+        emissionssources_name = [str(j)+"_"+i for i,j in zip(emissionssources["source_type"].tolist(), emissionssources["id"].tolist())]
+   
+        sel_emissionssource_name = st.selectbox(
+            'Select an Emission Source:',
+            emissionssources_name)
+        sel_emissionssource_id = emissionssources[emissionssources["id"] == int(sel_emissionssource_name.split("_")[0])]["id"].values[0]
+    
+        
+    # st.write(f"Selected Company: {sel_comp_name}, Selected Branch: {sel_branch_name}", f"Selected Emission Source: {sel_emissionssource_name}")
+      
+    footprints = requests.get(f"http://service:80/emissionssource/{sel_emissionssource_id}/footprints/").json()
+
+    if len(footprints) == 0:
+        st.write(f"No footprints found for the emissionssource: {sel_emissionssource_name}")
+        st.stop()
+    footprints = pd.DataFrame(footprints)
+    footprints.sort_values(by=['id'], inplace=True, ignore_index=True)
+    footprints_col = ['id'] + [col for col in footprints.columns.values if col != 'id']
+    footprints = footprints[footprints_col]   
+    footprints_ed = st.experimental_data_editor(footprints, hide_index=True, num_rows="dynamic", disabled=["id"], key="edit_footprints")
+    
+    edit_carbon_offset_data = st.session_state["edit_footprints"]
+    
+    if st.button('Update Footprints Data'):
+        if len(edit_carbon_offset_data['added_rows']) > 0:
+            post_footprints(edit_carbon_offset_data['added_rows'])
+        
+        if len(edit_carbon_offset_data['edited_rows']) > 0:
+            put_footprints(edit_carbon_offset_data['edited_rows'])
+        
+        if len(edit_carbon_offset_data['deleted_rows']) > 0:
+            delete_footprints(edit_carbon_offset_data['deleted_rows'],
+                                      footprints)        
+    
+
+
+
+## ------------ Footprints ------------

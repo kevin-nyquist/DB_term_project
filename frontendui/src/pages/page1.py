@@ -44,29 +44,54 @@ carbon_offsets = pd.DataFrame(carbon_offsets)
 
 number_of_branches = len(company_branches)
 
+
+company_summary = requests.get(f"http://service:80/company/{sel_comp_id}/summary/").json()
+
 st.write("## Total Information of the Company")
+st.markdown('____')
 company_info = {"Company Name": sel_comp_name, 
                 "Company ID": sel_comp_id, 
-                "Total number of branches": number_of_branches}
+                "Total number of branches": number_of_branches,
+                "Total Carbon Emissions": company_summary["total_emissions"],
+                "Total Sequestrations": company_summary["total_sequestrations"],
+                "Total Carbon Offsets": carbon_offsets["offset_amount"].sum(),
+                }
 company_info = pd.DataFrame([company_info])
 st.write(f"- ### Company Info")
-st.write(company_info)
+st.markdown(company_info.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 st.write("- ### Company Branches")
-st.write(company_branches)
+st.markdown(company_branches.style.hide(axis="index").to_html(), unsafe_allow_html=True)
+# st.write(company_branches)
 st.write("- ### Carbon Offsets")
-st.write(carbon_offsets)
+# st.write(carbon_offsets)
+st.markdown(carbon_offsets.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
+
+st.write(" ")
+st.write(" ")
 st.write("## Total Information of the Branch")
-st.write(f"Branch Name: {sel_branch_name}")
-st.write(f"Branch ID: {sel_branch_id}")
+st.markdown('____')
 
 
-# c_id = st.text_input('Company ID', '1')
-# if st.button("Company"):
-#     data = requests.get(f"http://service:80/companies/{c_id}").json()
-#     st.write(pd.DataFrame([data]))
-    
-# c_id2 = st.text_input('Company ID ', '1')
-# if st.button("branches"):
-#     data = requests.get(f"http://service:80/branches/{c_id2}").json()
-#     st.write(pd.DataFrame(data))
+branch_summary = requests.get(f"http://service:80/baranch/{sel_branch_id}/summary/").json()
+
+
+branch_info = {"Branch Name": sel_branch_name, 
+                "Branch ID": sel_branch_id, 
+                # "Total number of branches": number_of_branches,
+                "Total Carbon Emissions": branch_summary["total_emissions"],
+                "Total Sequestrations": branch_summary["total_sequestrations"],
+                # "Total Carbon Offsets": carbon_offsets["offset_amount"].sum(),
+                }
+branch_info = pd.DataFrame([branch_info])
+
+st.write(f"- ### Branch Info")
+st.markdown(branch_info.style.hide(axis="index").to_html(), unsafe_allow_html=True)
+st.write("- ### Emission Sources")
+
+emissionssources = requests.get(f"http://service:80/branch/{sel_branch_id}/emissionssources/").json()
+emissionssources = pd.DataFrame(emissionssources)
+st.markdown(emissionssources.style.hide(axis="index").to_html(), unsafe_allow_html=True)
+
+
+
