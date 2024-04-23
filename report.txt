@@ -1,0 +1,23 @@
+## Division of Work for Term Project
+
+Kevin Nyquist:
+- Designed UML diagram and relational model
+- Contributed to work on BCNF decomposition and completed the comparison between UML, BCNF, and 3NF
+- Implemented microservices for the backend endpoints, supplying queries for all CRUD operations on the database (documented on localhost:8001/docs)
+- Successfully implemented all and compiled contributions from each group member for submission.
+
+AmirAli Mirian
+- Implemented complete postgreSQL database, all tables with necessary constraints for database (localhost:5432 (user: postgres, pass: postgres))
+- Successfully created summary queries for combining information about all companies and all branches
+- created the graphical representation of the summary data for use in the demo
+
+Austin Downes
+- Contributed to work on BCNF decomposition
+- Populated the database with realistic information for use in the demo
+- Effectively completed work on time. Code was well commented and successfully implemented all methods.
+
+Bahram Afsharmanesh
+- Containerized entire application in Docker, allowing for seamless testing and deployment on all team members' devices
+- Created services in Docker to connect frontend and backend components
+- Implemented Streamlit UI with registration/login that displayed all database tables and forms to update, delete, and create elements from the UI in the database (localhost:80)
+- Effectively completed work on time with excellent quality of work
