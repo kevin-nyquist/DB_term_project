@@ -138,7 +138,7 @@ def get_carbon_emissions_sources_by_id(db: Session, source_id: int, skip: int = 
     return db.query(models.CarbonEmissionsSource).filter(models.CarbonEmissionsSource.id == source_id).offset(skip).limit(limit).all()
 
 
-def create_carbon_emissions_source(db: Session, emissions_source: schemas.CarbonEmissionsSourceCreate):
+def create_emissions_source(db: Session, emissions_source: schemas.CarbonEmissionsSourceCreate):
     db_emissions_source = models.CarbonEmissionsSource(**emissions_source.dict())
     db.add(db_emissions_source)
     db.commit()
@@ -187,7 +187,6 @@ def delete_regulation(db: Session, regulation_id: int):
 def update_regulation(db: Session, regulation_id: int, regulation_update: schemas.CarbonRegulationUpdate):
     regulation = db.query(models.CarbonRegulation).filter(models.CarbonRegulation.id == regulation_id).first()
     if regulation:
-        regulation.c_name = regulation_update.c_name
         regulation.description = regulation_update.description
         db.commit()
         db.refresh(regulation)
@@ -196,14 +195,16 @@ def update_regulation(db: Session, regulation_id: int, regulation_update: schema
     
 
 def get_regulation_by_name(db: Session, regulation_name: str):
-    return db.query(models.Company).filter(models.CarbonRegulation.regulation_name == regulation_name).first()
+    return db.query(models.CarbonRegulation).filter(models.CarbonRegulation.regulation_name == regulation_name).first()
 
+def get_regulation_by_id(db: Session, regulation_id: str):
+    return db.query(models.CarbonRegulation).filter(models.CarbonRegulation.id == regulation_id).first()
 
 def get_carbon_footprints(db: Session, source_id: int, skip: int = 0, limit: int = 100):
     return db.query(models.CarbonFootprint).filter(models.CarbonFootprint.source_id == source_id).offset(skip).limit(limit).all()
 
 
-def create_carbon_footprint(db: Session, footprint: schemas.CarbonFootprintCreate):
+def create_footprint(db: Session, footprint: schemas.CarbonFootprintCreate):
     db_footprint = models.CarbonFootprint(**footprint.dict())
     db.add(db_footprint)
     db.commit()
@@ -276,7 +277,7 @@ def get_sequestration_by_ids(db: Session, company_id: int, branch_id: int, emiss
         models.CompanyBranch.company_id == company_id
     ).first()
 
-def update_sequestration(db: Session, sequestration: models.CarbonSequestration, sequestration_update: schemas.CarbonSequestrationUpdate):
+def update_sequestration(db: Session, seq_id: int, sequestration_update: schemas.CarbonSequestrationUpdate):
     """
     Update a sequestration entry in the database.
 
@@ -288,11 +289,13 @@ def update_sequestration(db: Session, sequestration: models.CarbonSequestration,
     Returns:
         models.Sequestration: The updated sequestration entry.
     """
-    for value in sequestration_update.dict(exclude_unset=True).items():
-        setattr(sequestration, value)
-    db.commit()
-    db.refresh(sequestration)
-    return sequestration
+    carbon_seq = db.query(models.CarbonSequestration).filter(models.CarbonSequestration.id == seq_id).first()
+    if carbon_seq:
+        for field, value in sequestration_update.dict(exclude_unset=True).items():
+            setattr(carbon_seq, field, value)
+        db.commit()
+        db.refresh(carbon_seq)
+    return carbon_seq
 
 def get_carbon_sequestration(db: Session, seq_id: int):
     return db.query(models.CarbonSequestration).filter(models.CarbonSequestration.id == seq_id).first()
@@ -347,23 +350,25 @@ def get_carbon_footprint_by_ids(db: Session, company_id: int, branch_id: int, em
         models.CompanyBranch.company_id == company_id
     ).first()
 
-def update_carbon_footprint(db: Session, carbon_footprint: models.CarbonFootprint, carbon_footprint_update: schemas.CarbonFootprintUpdate):
+def update_footprint(db: Session, footprint_id: int, carbon_footprint_update: schemas.CarbonFootprintUpdate):
     """
     Update a carbon footprint entry in the database.
 
     Args:
         db (Session): SQLAlchemy database session.
-        carbon_footprint (models.CarbonFootprint): Carbon footprint entry to update.
+        footprint_id: int: Carbon footprint id to update.
         carbon_footprint_update (schemas.CarbonFootprintUpdate): Updated data for the carbon footprint entry.
 
     Returns:
         models.CarbonFootprint: The updated carbon footprint entry.
     """
-    for value in carbon_footprint_update.dict(exclude_unset=True).items():
-        setattr(carbon_footprint, value)
-    db.commit()
-    db.refresh(carbon_footprint)
-    return carbon_footprint
+    footprint = db.query(models.CarbonFootprint).filter(models.CarbonFootprint.id == footprint_id).first()
+    if footprint:
+        for field, value in carbon_footprint_update.dict(exclude_unset=True).items():
+            setattr(footprint, field, value)
+        db.commit()
+        db.refresh(footprint)
+    return footprint
 
 def get_carbon_footprint(db: Session, footprint_id: int):
     return db.query(models.CarbonFootprint).filter(models.CarbonFootprint.id == footprint_id).first()

@@ -139,11 +139,11 @@ def create_carbon_offset(offset: schemas.CarbonOffsetCreate, db: Session = Depen
         raise HTTPException(status_code=400, detail="Invalid company ID")
     return crud.create_carbon_offset(db=db, carbon_offset=offset)
 
-@app.post("/carbon_offset/", response_model=schemas.CarbonOffset)
+@router.post("/carbon_offset/", response_model=schemas.CarbonOffset)
 def create_carbon_offset(carbon_offset: schemas.CarbonOffsetCreate, db: Session = Depends(get_db)):
     return crud.create_carbon_offset(db=db, carbon_offset=carbon_offset)
 
-@app.put("/carbon_offset/{carbon_offset_id}", response_model=schemas.CarbonOffset)
+@router.put("/carbon_offset/{carbon_offset_id}", response_model=schemas.CarbonOffset)
 def update_carbon_offset(
     carbon_offset_id: int, carbon_offset_update: schemas.CarbonOffsetUpdate, db: Session = Depends(get_db)
 ):
@@ -152,7 +152,7 @@ def update_carbon_offset(
         raise HTTPException(status_code=404, detail="Carbon offset not found")
     return updated_offset
 
-@app.delete("/carbon_offset/{carbon_offset_id}", response_model=schemas.CarbonOffset)
+@router.delete("/carbon_offset/{carbon_offset_id}", response_model=schemas.CarbonOffset)
 def delete_carbon_offset(carbon_offset_id: int, db: Session = Depends(get_db)):
     deleted_offset = crud.delete_carbon_offset(db=db, carbon_offset_id=carbon_offset_id)
     if deleted_offset is None:
@@ -181,7 +181,7 @@ def read_carbon_offsets(company_id: int, db: Session = Depends(get_db), skip: in
     return offsets
 
 
-@app.put("/branch/{branch_id}", response_model=schemas.CompanyBranch)
+@router.put("/branch/{branch_id}", response_model=schemas.CompanyBranch)
 def update_branch(branch_id: int, branch_update: schemas.CompanyBranchUpdate, db: Session = Depends(get_db)):
     """
     Update an existing branch.
@@ -247,7 +247,7 @@ def create_company_branch(branch: schemas.CompanyBranchCreate, db: Session = Dep
     #     raise HTTPException(status_code=400, detail="Branch already exists in DB")
     return crud.create_company_branch(db=db, company_branch=branch)
 
-@app.delete("/branch/{branch_id}", response_model=schemas.CompanyBranch)
+@router.delete("/branch/{branch_id}", response_model=schemas.CompanyBranch)
 def delete_branch(branch_id: int, db: Session = Depends(get_db)):
     """
     Delete an existing branch.
@@ -286,7 +286,7 @@ def get_carbon_emissions_source(branch_id: int, db: Session = Depends(get_db), s
     return company_branches
 
 
-@router.post("/emissionssources/", response_model=schemas.CarbonEmissionsSource)
+@router.post("/emissionssource/", response_model=schemas.CarbonEmissionsSource)
 def create_carbon_emissions_source(emissions_source: schemas.CarbonEmissionsSourceCreate, db: Session = Depends(get_db)):
     """
     Create a new carbon offset entry.
@@ -304,7 +304,7 @@ def create_carbon_emissions_source(emissions_source: schemas.CarbonEmissionsSour
     db_branch = crud.get_company_branch(db, branch_id=emissions_source.branch_id)
     if db_branch is None:
         raise HTTPException(status_code=400, detail="Invalid branch ID")
-    return crud.create_carbon_emissions_source(db=db, emissions_source=emissions_source)
+    return crud.create_emissions_source(db=db, emissions_source=emissions_source)
 
 
 @router.get("/emissionssource/{source_id}/footprints/", response_model=List[schemas.CarbonFootprint])
@@ -327,11 +327,7 @@ def get_carbon_footprints(source_id: int, db: Session = Depends(get_db), skip: i
     carbon_footprints = crud.get_carbon_footprints(db=db, source_id=source_id, skip=skip, limit=limit)
     return carbon_footprints
 
-@app.post("/emissionssource/", response_model=schemas.CarbonEmissionsSource)
-def create_carbon_emissions_source(source: schemas.CarbonEmissionsSourceCreate, db: Session = Depends(get_db)):
-    return crud.create_carbon_emissions_source(db=db, source=source)
-
-@app.put("/emissionssource/{source_id}", response_model=schemas.CarbonEmissionsSource)
+@router.put("/emissionssource/{source_id}", response_model=schemas.CarbonEmissionsSource)
 def update_carbon_emissions_source(
     source_id: int, source_update: schemas.CarbonEmissionsSourceUpdate, db: Session = Depends(get_db)
 ):
@@ -340,7 +336,7 @@ def update_carbon_emissions_source(
         raise HTTPException(status_code=404, detail="Carbon emissions source not found")
     return updated_source
 
-@app.delete("/emissionssource/{source_id}", response_model=schemas.CarbonEmissionsSource)
+@router.delete("/emissionssource/{source_id}", response_model=schemas.CarbonEmissionsSource)
 def delete_carbon_emissions_source(source_id: int, db: Session = Depends(get_db)):
     deleted_source = crud.delete_carbon_emissions_source(db=db, source_id=source_id)
     if deleted_source is None:
@@ -366,20 +362,20 @@ def create_carbon_footprint(footprint: schemas.CarbonFootprintCreate, db: Sessio
     if db_emission_sources is None:
         raise HTTPException(status_code=400, detail="Emissions source not found")
     
-    return crud.create_carbon_footprint(db=db, footprint=footprint)
+    return crud.create_footprint(db=db, footprint=footprint)
 
 # Endpoint to update an existing carbon footprint entry
-@app.put("/carbon_footprint/{footprint_id}", response_model=schemas.CarbonFootprint)
+@router.put("/carbon_footprint/{footprint_id}", response_model=schemas.CarbonFootprint)
 def update_carbon_footprint(
     footprint_id: int, footprint_update: schemas.CarbonFootprintUpdate, db: Session = Depends(get_db)
 ):
-    updated_footprint = crud.update_carbon_footprint(db=db, footprint_id=footprint_id, footprint_update=footprint_update)
+    updated_footprint = crud.update_footprint(db=db, footprint_id=footprint_id, carbon_footprint_update=footprint_update)
     if updated_footprint is None:
         raise HTTPException(status_code=404, detail="Carbon footprint not found")
     return updated_footprint
 
 # Endpoint to delete a carbon footprint entry
-@app.delete("/carbon_footprint/{footprint_id}", response_model=schemas.CarbonFootprint)
+@router.delete("/carbon_footprint/{footprint_id}", response_model=schemas.CarbonFootprint)
 def delete_carbon_footprint(footprint_id: int, db: Session = Depends(get_db)):
     deleted_footprint = crud.delete_carbon_footprint(db=db, footprint_id=footprint_id)
     if deleted_footprint is None:
@@ -429,17 +425,17 @@ def create_carbon_sequestration(sequestration: schemas.CarbonSequestrationCreate
     
     return crud.create_carbon_sequestration(db=db, sequestration=sequestration)
 
-@app.put("/carbon_sequestration/{seq_id}", response_model=schemas.CarbonSequestrationBase)
+@router.put("/carbon_sequestration/{seq_id}", response_model=schemas.CarbonSequestrationUpdate)
 def update_carbon_sequestration(
     seq_id: int, seq_update: schemas.CarbonSequestrationUpdate, db: Session = Depends(get_db)
 ):
-    updated_seq = crud.update_carbon_sequestration(db=db, seq_id=seq_id, seq_update=seq_update)
+    updated_seq = crud.update_sequestration(db=db, seq_id=seq_id, sequestration_update=seq_update)
     if updated_seq is None:
         raise HTTPException(status_code=404, detail="Carbon sequestration entry not found")
     return updated_seq
 
 # Endpoint to delete a carbon sequestration entry
-@app.delete("/carbon_sequestration/{seq_id}", response_model=schemas.CarbonSequestrationBase)
+@router.delete("/carbon_sequestration/{seq_id}", response_model=schemas.CarbonSequestrationBase)
 def delete_carbon_sequestration(seq_id: int, db: Session = Depends(get_db)):
     deleted_seq = crud.delete_carbon_sequestration(db=db, seq_id=seq_id)
     if deleted_seq is None:
@@ -503,7 +499,7 @@ def get_regulations(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
     regulations = crud.get_carbon_regulations(db=db, skip=skip, limit=limit)
     return regulations
 
-@app.put("/regulation/{regulation_id}", response_model=schemas.CarbonRegulation)
+@router.put("/regulation/{regulation_id}", response_model=schemas.CarbonRegulation)
 def update_regulation(
     regulation_id: int, regulation_update: schemas.CarbonRegulationUpdate, db: Session = Depends(get_db)
 ):
@@ -523,7 +519,7 @@ def update_regulation(
     return updated_regulation
 
 
-@app.delete("/regulation/{regulation_id}", response_model=schemas.CarbonRegulation)
+@router.delete("/regulation/{regulation_id}", response_model=schemas.CarbonRegulation)
 def delete_regulation(regulation_id: int, db: Session = Depends(get_db)):
     """
     Delete an existing regulation.
