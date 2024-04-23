@@ -37,5 +37,5 @@ alembic revision --autogenerate -m "message"
 Run `python populate_db.py` to populate the db with a small number of entries. 
 To use a custom number of entries, you can use the script with args (e.g. `--companies 10`) 
 ```bash
-docker-compose exec service python models/populate_db.py
+docker-compose exec service python models/populate_db_real.py
 ```
