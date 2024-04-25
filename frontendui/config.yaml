@@ -4,17 +4,29 @@ cookie:
   name: some_cookie_name
 credentials:
   usernames:
+    admin:
+      email: admin@gmail.com
+      logged_in: false
+      name: admin
+      password: $2b$12$4pSJ3z5eRPFfl0ecC.D1hOTRP5E3MxwjOEWOHGtWr1OoKvPDh5CMO
     bahram:
       email: bahram@gmail.com
       failed_login_attempts: 0
       logged_in: false
-      name: Bahram Afsharmanesh
+      name: Ben Smith
       password: $2b$12$GSooks0DyOvZMeD/QVa0JeY235XRk1rT0Em8veDWVwgfDqQlread2
     bahram23:
       email: bahram.a@gmail.com
+      failed_login_attempts: 0
       logged_in: false
       name: Bahram Afsharmanesh
       password: $2b$12$QLkiNaGFiQlJ3BnCQj5Vtu0ClUZfItjsNxdT0OlQ6k6M3oWJ9jVWi
+    ben1234:
+      email: ben1234.ben@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Bens Smiths
+      password: $2b$12$eN3U19o7RoLUkuD7HB5KJ.yKQuXV0sPYmKNnyzFREgBZtihP9sdvK
     jsmith:
       email: jsmith@gmail.com
       failed_login_attempts: 0

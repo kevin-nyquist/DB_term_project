@@ -19,7 +19,7 @@ st.write(
 st.write("## Select a Table to Edit")
 sel_table = st.selectbox(
     'Tables:',
-    ["companies", "branches", "carbon_offsets", "carbon_emissions_sources", "carbon_regulations", "carbon_sequestration", "footsprints"])
+    ["companies", "branches", "footsprints"])
 
 st.markdown('____')
 
