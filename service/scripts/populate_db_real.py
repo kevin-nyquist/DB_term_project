@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 import datetime
 import random
 import argparse
-from models import Base, Company, OffsetType, CarbonOffset, CompanyBranch, CarbonEmissionsSource, CarbonFootprint, CarbonSequestration
+from app.models.models import Base, Company, OffsetType, CarbonOffset, CompanyBranch, CarbonEmissionsSource, CarbonFootprint, CarbonSequestration
 
 # Example lists for generating company names
 prefixes = ["Enviro", "Green", "Eco", "Bio", "Planet", "Sustain", "Terra", "Vita", "Geo", "Orga"]

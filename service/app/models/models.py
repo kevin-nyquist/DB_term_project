@@ -3,7 +3,7 @@ from sqlalchemy import Column, ForeignKey
 import enum
 from sqlalchemy.orm import relationship
 
-from models.database import Base
+from app.models.database import Base
 
 
 class Company(Base):

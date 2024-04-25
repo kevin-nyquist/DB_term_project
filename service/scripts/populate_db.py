@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 import datetime
 import random
 import argparse
-from models import Base, Company, OffsetType, CarbonOffset, CompanyBranch, CarbonEmissionsSource, CarbonFootprint
+from app.models.models import Base, Company, OffsetType, CarbonOffset, CompanyBranch, CarbonEmissionsSource, CarbonFootprint
 
 def generate_data(num_companies, num_branches_per_company, num_offsets_per_company, num_emissions_per_branch, num_footprints_per_emission):
 

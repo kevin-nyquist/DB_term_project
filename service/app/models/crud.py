@@ -1,6 +1,6 @@
 from http.client import HTTPException
 from sqlalchemy.orm import Session
-from models import models, schemas
+from app.models import models, schemas
 from sqlalchemy import func as F
 
 # gets company from company ID
