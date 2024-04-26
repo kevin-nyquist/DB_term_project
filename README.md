@@ -35,7 +35,6 @@ Lastly, in the main project directory. Execute this command to populate the data
 docker compose exec service sh init.sh 
 ```
 
-```
 If you make changes on the `models.py` file, you have to make a new migration. You can do it by running: 
 ```bash
 alembic revision --autogenerate -m "message"
