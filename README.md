@@ -2,7 +2,7 @@
 
 ## All information related to the database design are contained in 'DBMS Term Project.pptx'
 
-To initialize the project, run the following terminal command inside the project directory
+To initialize the project, run the following terminal command inside the project directory. You must have Docker installed and open.
 ```bash
 docker-compose up --build
 ```
