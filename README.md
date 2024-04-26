@@ -30,7 +30,7 @@ psql
 ```bash
 CREATE DATABASE dbproject;
 ```
-Lastly, in the main project directory. Execute this command to populate the database.
+In the main project directory. Execute this command to populate the database.
 ```bash
 docker compose exec service sh init.sh
 ```
