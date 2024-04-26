@@ -26,6 +26,8 @@ docker exec -it postgres14 bash
 And execute the following two commands to create an empty PostgreSQL database named "dbproject"
 ```bash
 psql
+```
+```bash
 CREATE DATABASE dbproject;
 ```
 Lastly, in the main project directory. Execute this command to populate the database and go to localhost:80 in your browser.
