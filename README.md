@@ -1,14 +1,13 @@
 # DB_term_project
 
-## All information related to the database design are present in 'DBMS Term Project.pptx'
+## All information related to the database design are contained in 'DBMS Term Project.pptx'
 
-To initialize the project, run this command (you need --build for the first time):
-
-```python
+To initialize the project, run the following terminal command inside the project directory
+```bash
 docker-compose up --build
 ```
 
-So, you have to see the following services:
+So now you have to see the following services:
 - **frontendui**: localhost:80
 - **service**: localhost:8001
 - **service_swagger**: localhost:8001/docs
@@ -16,24 +15,20 @@ So, you have to see the following services:
 
 By updating the code, services have to reload, so it is not necessary to restart the docker to update the code.
 
-## Database
+## Initializing the Database
 ### Postgres
 We are using `SQLAlchemy` as our ORM and `Alembic` as our migration tool.  
 
-Run the following command in the terminal inside the project directory
-```bash
-docker-compose up --build
-```
-Then execute the following command to enter the postreSQL shell
+Execute the following command in terminal to enter the PostreSQL shell
 ```bash
 docker exec -it postgres14 bash
 ```
-And execute the following two commands to create a postgreSQL database named "dbproject"
+And execute the following two commands to create an empty PostgreSQL database named "dbproject"
 ```bash
 psql
-CREATE DATABASE dbproject
+CREATE DATABASE dbproject;
 ```
-Lastly, in the main project directory. Execute this command and go to localhost:80 in your browser.
+Lastly, in the main project directory. Execute this command to populate the database and go to localhost:80 in your browser.
 ```bash
 docker compose exec service sh init.sh 
 ```
