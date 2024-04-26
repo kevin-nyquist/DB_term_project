@@ -30,10 +30,15 @@ psql
 ```bash
 CREATE DATABASE dbproject;
 ```
-Lastly, in the main project directory. Execute this command to populate the database and go to localhost:80 in your browser.
+Lastly, in the main project directory. Execute this command to populate the database.
 ```bash
-docker compose exec service sh init.sh 
+docker compose exec service sh init.sh
 ```
+Lastly, stop the docker container and restart it with this command.
+```bash
+docker-compose up
+```
+The UI is now available at localhost:80 in your browser
 
 If you make changes on the `models.py` file, you have to make a new migration. You can do it by running: 
 ```bash
