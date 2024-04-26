@@ -13,7 +13,7 @@ So now you have to see the following services:
 - **service_swagger**: localhost:8001/docs
 - **postgre**: localhost:5432  (user: postgres, pass: postgres)
 
-By updating the code, services have to reload, so it is not necessary to restart the docker to update the code.
+By updating the code, services have to reload, so it is not necessary to restart the docker to update the code. It does require restart after initializing the database.
 
 ## Initializing the Database
 ### Postgres
