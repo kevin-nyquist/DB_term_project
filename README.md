@@ -1,4 +1,4 @@
-# DB_term_project
+# Carbon Analytics Platform
 
 ## All information related to the database design are contained in 'DBMS Term Project.pptx'
 
